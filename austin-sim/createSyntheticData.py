@@ -1,5 +1,11 @@
 from xml.dom import minidom
-import random
+
+'''
+def generateNodes(nonHierarchical):
+    landDimensions = (1000, 1000)
+    if nonHierarchical:
+        housingZone = (landDimensions[0]/3, landDimensions[1]/3)
+
 
 doc = minidom.Document()
 
@@ -86,4 +92,4 @@ for i in range(1, 1001):
 
 with open("data/plans.xml", "w") as f:
     f.write(plans.toprettyxml(indent="\t"))
-
+'''
