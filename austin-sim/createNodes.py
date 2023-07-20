@@ -15,26 +15,25 @@ def newNode(zoneBounds, occupied):
     occupied.append(node)
     return node
 
-def genZoneNodes(zone, numNodes, plt, color):
-    bounds = zone.bounds
-    occupiedNodes = []
-    for i in range(numNodes):
-        length = len(occupiedNodes)
-        if length % 1000 == 0:
-            print(length)
-        node = newNode(bounds, occupiedNodes)
-        plt.plot(*node, marker="o", color=color)
-    return occupiedNodes
+def genZoneNodes(land, numNodes, plt):
+    zoneNodes = []
+    print(len(land), 'areas in zone')
+    for area in land:
+        occupiedNodes = []
+        for i in range(numNodes):
+            node = newNode(area, occupiedNodes)
+            plt.plot(*node, marker=".", color='white', markersize=1)
+        zoneNodes.extend(occupiedNodes)
+    return zoneNodes
 
 def genAllNodes(zones, plt):
-    zoneNodes = {}
     for zone, info in zones.items():
-        zoneBox = info['box']
-        area = zoneBox.area
+        land = info['land']
+        sampleArea = land[0]
+        area = (sampleArea[2] - sampleArea[0]) ** 2
         buildingArea = info['area']
-        buildingColor = info['color']
         numNodes = int(area / buildingArea)
-        print(zone, numNodes)
-        nodes = genZoneNodes(zoneBox, numNodes, plt, buildingColor)
-        zoneNodes[zone] = nodes
-    return zoneNodes
+        nodes = genZoneNodes(land, numNodes, plt)
+        print(numNodes, 'nodes made in', zone)
+        zones[zone]['nodes'] = nodes
+    return zones

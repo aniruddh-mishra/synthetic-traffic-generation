@@ -1,78 +1,68 @@
 import random
 from shapely import box
-import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 
-def containsShape(land, shapes):
-    for shape in shapes:
-        if land.overlaps(shape) or land.contains(shape):
-            return shape
-    return False
+def genZones(dimensions, zones, plt):
+    minArea = 0
+    for zone, info in zones.items():
+        if info['area'] > minArea:
+            minArea = info['area'] * info['minBuildings']
+        zones[zone]['land'] = []
 
-def cutLand(land, shape):
-    landBounds = list(land.bounds)
-    shapeBounds = shape.bounds
-   
-    cutLands = []
-    for i in range(4):
-        testBounds = landBounds.copy()
-        testBounds[i] = shapeBounds[(i + 2) % 4]
-        cutLands.append(box(*testBounds))
-    
-    bestArea = 0
-    bestLand = None
-    for land in cutLands:
-        if land.area > bestArea:
-            bestLand = land
-            bestArea = land.area
-    return bestLand
-
-def newLand(land, shapes):
-    ogLand = land
+    minLength = minArea ** 0.5
+    x, y = (0, minLength)
+    zoneTypes = list(zones.keys())
+    weights = []
+    for zone in zoneTypes:
+        weights.append(zones[zone]['landArea'])
     while True:
-        shape = containsShape(land, shapes)
-        if shape:
-            land = cutLand(land, shape)
-        else:
+        x += minLength
+        if x > dimensions[0]:
+            x = minLength
+            y += minLength
+        if y > dimensions[1] or len(zoneTypes) == 0:
             break
+        zone = random.choices(zoneTypes, weights=weights)[0]
+        zones[zone]['land'].append((x - minLength, y - minLength, x, y))
+
+        if len(zones[zone]['land']) * minArea > zones[zone]['landArea']:
+            index = zoneTypes.index(zone)
+            zoneTypes.remove(zone)
+            weights.pop(index)
     
-    if land.area < 100:
-        return newLand(ogLand, shapes)
 
-    return land
+    plotZones(minLength, zones, plt)
+    return zones
 
-def createShape(land):
-    landBounds = land.bounds
-    minX = random.randint(landBounds[0], int((landBounds[2] - landBounds[0])/3) + landBounds[0])
-    minY = random.randint(landBounds[1], int((landBounds[3] - landBounds[1])/3) + landBounds[1])
-    maxX = random.randint(minX, landBounds[2])
-    maxY = random.randint(minY, landBounds[3])
-    return box(minX, minY, maxX, maxY)
-
-def genZones(land, zones):
-    zoneBoxes = {}
-    shapes = []
-    remainingArea = land.area
-    for zone in zones:
-        land = newLand(land, shapes)
-        counter = 0
-        while True:
-            shape = createShape(land)
-            if shape.area > remainingArea/(len(zones) - len(shapes) + 5) and shape.area < remainingArea/(len(zones) - len(shapes) + 3) or counter > 100:
-                break
-            counter += 1
-
-        plt.plot(*shape.exterior.xy, label=zone)
-        zoneBoxes[zone] = shape.bounds
-        shapes.append(shape)
-        remainingArea -= shape.area
-        
-    return zoneBoxes
-
+def plotZones(minLength, zones, plt):
+    for zone, info in zones.items():
+        land = info['land']
+        setLegend = True
+        for segment in land:
+            landBox = box(*segment)
+            plt.gca().add_patch(Rectangle(segment[:2], minLength, minLength, facecolor=info['color'], label=zone if setLegend else "__nolegend__"))
+            setLegend = False
 
 if __name__ == "__main__":
-    land = box(0, 0, 1000, 1000)
-    zones = ['residential', 'industrial', 'commercial']
-    print(genZones(land, zones))
+    import matplotlib.pyplot as plt
+    dimensions = (1000, 1000)
+    zones = {
+            'res': {
+                'area': 200,
+                'landArea': 200000,
+                'color': 'red' 
+                },
+            'ind': {
+                'area': 3000,
+                'landArea': 200000,
+                'color': 'blue'
+                },
+            'com': {
+                'area': 300,
+                'landArea': 2000000,
+                'color': 'green'
+                }
+            }
+    genZones(dimensions, zones, plt)
     plt.legend()
     plt.show()
-
