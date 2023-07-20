@@ -8,6 +8,7 @@ __pycache__/
 
 # Setup for Simulation
 */setup/*
+!*/setup/config.xml
 
 # Distribution / packaging
 .Python
