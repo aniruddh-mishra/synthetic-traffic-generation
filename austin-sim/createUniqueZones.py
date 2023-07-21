@@ -3,11 +3,13 @@ from shapely import box
 from matplotlib.patches import Rectangle
 
 def genZones(dimensions, zones, plt):
+    totalArea = dimensions[0] * dimensions[1]
     minArea = 0
     for zone, info in zones.items():
         if info['area'] > minArea:
             minArea = info['area'] * info['minBuildings']
         zones[zone]['land'] = []
+        zones[zone]['landArea'] = zones[zone]['landAreaPct'] * totalArea
 
     minLength = minArea ** 0.5
     x, y = (0, minLength)

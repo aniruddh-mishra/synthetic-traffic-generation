@@ -29,6 +29,8 @@ def genZoneNodes(land, numNodes, plt):
 def genAllNodes(zones, plt):
     for zone, info in zones.items():
         land = info['land']
+        if len(land) == 0:
+            continue
         sampleArea = land[0]
         area = (sampleArea[2] - sampleArea[0]) ** 2
         buildingArea = info['area']
