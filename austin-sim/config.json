@@ -1,13 +1,13 @@
 {
   "city": {
-    "xLength": 10000,
-    "yLength": 10000
+    "xLength": 5000,
+    "yLength": 5000
   },
   "zones": {
     "residential": {
-      "area": 2092, 
+      "area": 5750, 
       "landAreaPct": 0.5, 
-      "minBuildings": 100, 
+      "minBuildings": 20, 
       "color": "red"
     }, 
     "industrial": {
@@ -17,13 +17,13 @@
       "color": "orange"
     }, 
     "commercial": {
-      "area": 5000, 
+      "area": 10000, 
       "landAreaPct": 0.1, 
-      "minBuildings": 90, 
+      "minBuildings": 10, 
       "color": "green"
     }, 
     "apartment": {
-      "area": 3000, 
+      "area": 25000, 
       "landAreaPct": 0.2, 
       "minBuildings": 3, 
       "color": "blue"
@@ -36,3 +36,4 @@
     }
   }
 }
+

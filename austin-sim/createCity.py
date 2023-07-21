@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt 
 from createUniqueZones import genZones
 from createNodes import genAllNodes
+from createLinks import genAllLinks
 import json
 
 def main():
@@ -19,8 +20,9 @@ def main():
 
     genZones(cityDimensions, zoneInfo, plt)
     genAllNodes(zoneInfo, plt)
+    genAllLinks(1, zoneInfo, plt)
+
     plt.legend(loc="upper left")
     plt.show()
     
-
 main()
