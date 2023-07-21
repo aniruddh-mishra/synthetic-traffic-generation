@@ -44,5 +44,3 @@ def genAllLinks(method, zones, plt):
 
     random.shuffle(hubs)
     links.extend(genInterZoneLinks(hubs, plt))
-    print(links, len(links))
-    print(counter)
