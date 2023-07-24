@@ -6,6 +6,7 @@ This repository contains the code to create a synthetic population for a theoret
 1. [ Install ](#install)
 2. [ Usage ](#usage)
 3. [ Conclusion ](#conclusion)
+4. [ License ](#license)
 
 ## Install
 
