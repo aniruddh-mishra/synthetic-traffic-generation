@@ -1,0 +1,132 @@
+from xml.dom import minidom
+import random
+
+def writeFiles(zoneInfo, households, links):
+    createNetwork(zoneInfo, links)
+    createPopulation(households)
+
+def createPopulation(households):
+    populationDoc = minidom.Document()
+
+    population = populationDoc.createElement('population')
+    populationDoc.appendChild(population)
+
+    numPeople = 0
+    for house in households:
+        members = house.members
+        for person in members:
+            numPeople += 1
+            person = createPerson(person, populationDoc, numPeople)
+            population.appendChild(person)
+
+    writeFile(populationDoc, "plans.xml")
+
+def createPerson(person, doc, numPeople):
+    personXML = doc.createElement('person')
+    attributes = {
+        "id": numPeople,
+    }
+    setAttributes(personXML, attributes)
+    
+    plan = doc.createElement("plan")
+    personXML.appendChild(plan)
+
+    # TODO Change completely
+    createAct("home", person.house.location, plan, doc, "car", "08:00:00")
+    createAct("work", person.work.location, plan, doc, "car", "17:30:00")
+    createAct("home", person.house.location, plan, doc)
+    return personXML
+
+def createAct(actType, location, planSection, doc, endTime=None, leg=None):
+    action = doc.createElement('act')
+    attributes = {
+        "type": actType,
+        "x": location[0],
+        "y": location[1],
+    }
+    if endTime:
+        attributes["end_time"] = endTime
+    setAttributes(action, attributes)
+    planSection.appendChild(action)
+    if leg:
+        legXML = doc.createElement('leg')
+        attributes = {
+            "mode": leg
+        }
+        setAttributes(legXML, attributes)
+        planSection.appendChild(legXML)
+
+def createNetwork(zoneInfo, links):
+    networkDoc = minidom.Document()
+
+    network = networkDoc.createElement('network')
+    network.setAttribute('name', 'synthetic city network')
+    networkDoc.appendChild(network)
+    
+    nodesSection = networkDoc.createElement('nodes')
+    network.appendChild(nodesSection)
+
+    numNodes = 0
+    allNodes = []
+    for zone, info in zoneInfo.items():
+        numNodes, nodesResult = createNodes(info["nodes"], nodesSection, numNodes, networkDoc)
+        allNodes.extend(nodesResult)
+
+    linksSection = networkDoc.createElement('links')
+    network.appendChild(linksSection)
+
+    numLinks = 1
+    for link in links:
+        createLink(link, linksSection, numLinks, networkDoc, allNodes)
+        numLinks += 1
+    
+    writeFile(networkDoc, "network.xml")
+
+def createLink(link, linksSection, numLinks, doc, allNodes):
+    linkXML = doc.createElement("link")
+    startNode = allNodes[link[0] - 1]
+    endNode = allNodes[link[1] - 1]
+    distance = calcDistance(startNode, endNode)
+    attributes = {
+        "id": numLinks,
+        "from": link[0],
+        "to": link[1],
+        "length": distance,
+        "capacity": 1800,
+        "permlanes": 1,
+        "modes": "cars",
+        "freespeed": 27.8
+    }
+    setAttributes(linkXML, attributes)
+    linksSection.appendChild(linkXML)
+
+def calcDistance(nodeOne, nodeTwo):
+    deltaX = nodeOne[0] - nodeTwo[0]
+    deltaY = nodeOne[1] - nodeTwo[1]
+    distance = (deltaX ** 2 + deltaY ** 2) ** 0.5
+    distance *= (1 + random.uniform(0, 0.4))
+    return distance
+
+def createNodes(nodes, nodesSection, numNodes, doc):
+    allNodes = []
+    for nodesArea in nodes.values():
+        for node in nodesArea:
+            numNodes += 1
+            nodeXML = doc.createElement('node')
+            attributes = {
+                "id": numNodes,
+                "x": node[0],
+                "y": node[1]
+            }
+            allNodes.append(node)
+            setAttributes(nodeXML, attributes)
+            nodesSection.appendChild(nodeXML)
+    return numNodes, allNodes
+
+def setAttributes(xmlData, attributes):
+    for attribute, value in attributes.items():
+        xmlData.setAttribute(attribute, str(value))
+
+def writeFile(file, name):
+    with open("output/" + name, "w") as f:
+        f.write(file.toprettyxml(indent="\t"))

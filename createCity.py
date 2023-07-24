@@ -4,6 +4,7 @@ from createNodes import genAllNodes
 from createLinks import genAllLinks
 from createJobs import genJobs
 from createHouseholds import genHouseholds
+from convertData import writeFiles
 import json
 
 def main():
@@ -22,11 +23,12 @@ def main():
 
     genZones(cityDimensions, zoneInfo, plt)
     genAllNodes(zoneInfo, plt)
-    genAllLinks(1, zoneInfo, plt)
+    links = genAllLinks(1, zoneInfo, plt)
     jobs = genJobs(zoneInfo)
-    houses = genHouseholds(zoneInfo, jobs)
-    if not houses:
+    houseHolds = genHouseholds(zoneInfo, jobs)
+    if not houseHolds:
      return False
+    writeFiles(zoneInfo, houseHolds, links)
     plt.legend(loc="upper left")
     plt.show()
     

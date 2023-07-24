@@ -30,6 +30,7 @@ def findJob(jobs):
     return findJob(jobs)
 
 def genHouseholds(zones, jobs):
+    households = []
     for zone, info in zones.items():
         if info["type"] != "housing":
             continue
@@ -37,10 +38,10 @@ def genHouseholds(zones, jobs):
             areaJobs = findCloseJobs(area, jobs)
             for node in nodes:
                 house = makeHousehold(node, areaJobs, info["numPeople"])
+                households.append(house)
                 if not house:
                     return False
-                print(house, "\n")
-    return True
+    return households
 
 def findCloseJobs(area, jobs):
     centralArea = centerOfArea(area)

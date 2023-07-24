@@ -4,12 +4,13 @@ def genIntraZoneLinks(nodes, centralHub, plt, counter, centralHubIndex):
     links = []
     for node in nodes:
         if node == centralHub:
+            counter += 1
             continue
         dx, dy = [node[0], centralHub[0]], [node[1], centralHub[1]]
         links.append((counter, centralHubIndex))
         plt.plot(dx, dy, color="black")
         counter += 1
-    return links
+    return links, counter
 
 def genInterZoneLinks(centralHubs, plt):
     links = []
@@ -37,10 +38,11 @@ def genAllLinks(method, zones, plt):
         nodes = info['nodes']
         for nodeSet in nodes.values():
             centralHub = random.choice(nodeSet)
-            centralHubIndex = nodeSet.index(centralHub)
-            links.extend(genIntraZoneLinks(nodeSet, centralHub, plt, counter, centralHubIndex))
+            centralHubIndex = nodeSet.index(centralHub) + counter
+            linksResult, counter = genIntraZoneLinks(nodeSet, centralHub, plt, counter, centralHubIndex)
+            links.extend(linksResult)
             hubs.append((centralHub, centralHubIndex))
-            counter += len(nodeSet)
 
     random.shuffle(hubs)
     links.extend(genInterZoneLinks(hubs, plt))
+    return links
