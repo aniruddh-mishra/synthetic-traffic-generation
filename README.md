@@ -48,10 +48,18 @@ Use the package manager `pip` to install the required libraries.
 pip install -r requirements.txt
 ```
 
-Finally, create an output directory for the script to put the MATSIM configuration files into:
+Next, create an output directory for the script to put the MATSIM configuration files into:
 
 ```bash
 mkdir output
+```
+
+Now, we need to install the MATSIM simulator. Follow the steps on [the example repository](https://github.com/matsim-org/matsim-example-project) to build the MATSIM executable file.
+
+Once you have built the .jar file move the file to repository of the synthetic traffic generation model. Finally, rename the file to matsim.jar. If you cloned the matsim example project inside this repository, you can just use the following command to do this step:
+
+```bash
+mv matsim-example-project-0.0.1-SNAPSHOT.jar ../matsim.jar
 ```
 
 ## Usage
