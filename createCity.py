@@ -26,16 +26,29 @@ def main():
     
     zoneInfo = config['zones']
 
+    print("Generating zones...")
     genZones(cityDimensions, zoneInfo, plt, random.Random(3))
+   
+    print("Generating nodes in zones...")
     genAllNodes(zoneInfo, plt)
+
+    print("Generating links between nodes...")
     links = genAllLinks(1, zoneInfo, plt)
+
+    print("Generating jobs within city...")
     jobs = genJobs(zoneInfo)
+
+    print("Generating households with agents...")
     houseHolds = genHouseholds(zoneInfo, jobs, cityInfo['pctWorkFromHome']/100)
+    
     if not houseHolds:
      return False
+
+    print("Converting data to MATSIM format")
     writeFiles(zoneInfo, houseHolds, links)
     plt.legend(loc="upper left")
-    
+   
+    print("Running MATSIM simulation and generating plot...")
     # os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
     plt.show()
 

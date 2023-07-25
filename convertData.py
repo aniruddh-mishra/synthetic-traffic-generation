@@ -1,5 +1,6 @@
 from xml.dom import minidom
 import random
+from status import StatusBar
 
 def writeFiles(zoneInfo, households, links):
     createNetwork(zoneInfo, links)
@@ -11,12 +12,16 @@ def createPopulation(households):
     population = populationDoc.childNodes[1]
 
     numPeople = 0
+    print(len(households), "houses to convert...")
+    statusBar = StatusBar(len(households))
     for house in households:
         members = house.members
         for person in members:
             numPeople += 1
             person = createPerson(person, populationDoc, numPeople)
             population.appendChild(person)
+        statusBar.updateProgress()
+    statusBar.complete()
 
     writeFile(populationDoc, "plans.xml")
 
@@ -76,11 +81,15 @@ def createNetwork(zoneInfo, links):
     network.appendChild(linksSection)
 
     numLinks = 1
+    print(len(links), "links to create")
+    statusBar = StatusBar(len(links))
     for link in links:
         createLink(link, linksSection, numLinks, networkDoc, allNodes)
         numLinks +=1
         createLink([link[1], link[0]], linksSection, numLinks, networkDoc, allNodes)
         numLinks += 1
+        statusBar.updateProgress()
+    statusBar.complete()
     
     writeFile(networkDoc, "network.xml")
 

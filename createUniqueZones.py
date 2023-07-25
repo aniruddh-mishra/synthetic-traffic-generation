@@ -1,16 +1,20 @@
 from shapely import box
+from status import StatusBar
 from matplotlib.patches import Rectangle
 
 def genZones(dimensions, zones, plt, random):
     totalArea = dimensions[0] * dimensions[1]
     minArea = 0
     for zone, info in zones.items():
-        if info['area'] > minArea:
+        if info['area'] > minArea or not minArea:
             minArea = info['area'] * info['minBuildings']
         zones[zone]['land'] = []
         zones[zone]['landArea'] = zones[zone]['landAreaPct'] * totalArea
 
     minLength = minArea ** 0.5
+    numBoxes = (dimensions[1] / minLength) * (dimensions[0] / minLength)
+    statusBar = StatusBar(numBoxes)
+
     x, y = (0, minLength)
     zoneTypes = list(zones.keys())
     weights = []
@@ -30,7 +34,10 @@ def genZones(dimensions, zones, plt, random):
             index = zoneTypes.index(zone)
             zoneTypes.remove(zone)
             weights.pop(index)
-    
+        statusBar.updateProgress()
+
+    statusBar.complete()
+
 
     plotZones(minLength, zones, plt)
     return zones
@@ -47,6 +54,8 @@ def plotZones(minLength, zones, plt):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import json
+    import random 
+
     with open('config.json', 'r') as f:
         info = json.load(f)
 
@@ -54,6 +63,6 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    genZones(dimensions, zoneInfo, plt)
+    genZones(dimensions, zoneInfo, plt, random.Random(3))
     plt.legend()
     plt.show()

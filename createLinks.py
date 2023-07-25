@@ -1,4 +1,5 @@
 import random
+from status import StatusBar
 
 def genIntraZoneLinks(nodes, centralHub, plt, counter, centralHubIndex):
     links = []
@@ -38,13 +39,19 @@ def genAllLinks(method, zones, plt):
         nodes = info.get('nodes')
         if not nodes:
             continue
+        print(len(nodes.keys()), "areas in zone", zone)
+        statusBar = StatusBar(len(nodes.keys()))
         for nodeSet in nodes.values():
             centralHub = random.choice(nodeSet)
             centralHubIndex = nodeSet.index(centralHub) + counter
             linksResult, counter = genIntraZoneLinks(nodeSet, centralHub, plt, counter, centralHubIndex)
             links.extend(linksResult)
             hubs.append((centralHub, centralHubIndex))
+            statusBar.updateProgress()
 
+        statusBar.complete()
+
+    print("Connecting areas with highways...")
     random.shuffle(hubs)
     links.extend(genInterZoneLinks(hubs, plt))
     return links

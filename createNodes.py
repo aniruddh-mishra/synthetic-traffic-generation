@@ -1,4 +1,5 @@
 import random
+from status import StatusBar
 from shapely import Point
 
 def newNode(zoneBounds, occupied):
@@ -15,15 +16,16 @@ def newNode(zoneBounds, occupied):
     occupied.append(node)
     return node
 
-def genZoneNodes(land, numNodes, plt):
+def genZoneNodes(land, numNodes, plt, bar):
     zoneNodes = {}
-    print(len(land), 'areas in zone')
     for area in land:
         occupiedNodes = []
         for i in range(numNodes):
             node = newNode(area, occupiedNodes)
             plt.plot(*node, marker=".", color='white', markersize=1)
+            bar.updateProgress()
         zoneNodes[area] = occupiedNodes
+    bar.complete()
     return zoneNodes
 
 def genAllNodes(zones, plt):
@@ -35,7 +37,8 @@ def genAllNodes(zones, plt):
         area = (sampleArea[2] - sampleArea[0]) ** 2
         buildingArea = info['area']
         numNodes = round(area / buildingArea)
-        nodes = genZoneNodes(land, numNodes, plt)
-        print(numNodes * len(land), 'nodes made in', zone)
+        statusBar = StatusBar(numNodes * len(land))
+        print(numNodes * len(land), "nodes in zone", zone)
+        nodes = genZoneNodes(land, numNodes, plt, statusBar)
         zones[zone]['nodes'] = nodes
     return zones

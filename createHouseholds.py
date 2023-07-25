@@ -1,4 +1,5 @@
 import random
+from status import StatusBar
 from objects import Person, House
 
 def makeHousehold(node, areaJobs, numPeople, pctWorkFromHome):
@@ -37,6 +38,7 @@ def findJob(jobs):
 
 def genHouseholds(zones, jobs, pctWorkFromHome):
     households = []
+    statusBar = StatusBar(len(zones.keys()))
     for zone, info in zones.items():
         if not info.get('nodes'):
             continue
@@ -48,7 +50,11 @@ def genHouseholds(zones, jobs, pctWorkFromHome):
                 house = makeHousehold(node, areaJobs, info["numPeople"], pctWorkFromHome)
                 households.append(house)
                 if not house:
+                    statusBar.fail()
                     return False
+        statusBar.updateProgress()
+
+    statusBar.complete()
     return households
 
 def findCloseJobs(area, jobs):
