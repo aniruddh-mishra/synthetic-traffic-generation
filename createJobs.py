@@ -13,7 +13,7 @@ def genJobs(zones):
     for zone, info in zones.items():
         if not info.get('nodes'):
             continue
-        if info["type"] != "work" and info["type"] != "leisure":
+        if "work" not in info["types"]:
             continue
         
         for area, nodes in info["nodes"].items():

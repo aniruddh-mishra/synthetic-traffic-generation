@@ -29,7 +29,7 @@ def main():
     genAllNodes(zoneInfo, plt)
     links = genAllLinks(1, zoneInfo, plt)
     jobs = genJobs(zoneInfo)
-    houseHolds = genHouseholds(zoneInfo, jobs)
+    houseHolds = genHouseholds(zoneInfo, jobs, cityInfo['pctWorkFromHome']/100)
     if not houseHolds:
      return False
     writeFiles(zoneInfo, houseHolds, links)

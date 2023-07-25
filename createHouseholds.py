@@ -1,18 +1,22 @@
 import random
 from objects import Person, House
 
-def makeHousehold(node, areaJobs, numPeople):
+def makeHousehold(node, areaJobs, numPeople, pctWorkFromHome):
     home = House(node)
     numMembers = random.randint(*numPeople)
     for member in range(numMembers):
-        if len(areaJobs.keys()) == 0:
-            continue
-        job = findJob(areaJobs)
-        if not job:
-            print("Add more jobs to config.json, ran out of work")
-            return False
-        agent = Person(home, job)
-        job.addWorker(agent)
+        workFromHome = random.random() < pctWorkFromHome
+        if workFromHome:
+            agent = Person(home, home)
+        else:
+            if len(areaJobs.keys()) == 0:
+                continue
+            job = findJob(areaJobs)
+            if not job:
+                print("Add more jobs to config.json, ran out of work")
+                return False
+            agent = Person(home, job)
+            job.addWorker(agent)
         home.addMember(agent)
     
     return home
@@ -31,17 +35,17 @@ def findJob(jobs):
         return False
     return findJob(jobs)
 
-def genHouseholds(zones, jobs):
+def genHouseholds(zones, jobs, pctWorkFromHome):
     households = []
     for zone, info in zones.items():
         if not info.get('nodes'):
             continue
-        if info["type"] != "housing":
+        if "housing" not in info["types"]:
             continue
         for area, nodes in info["nodes"].items():
             areaJobs = findCloseJobs(area, jobs)
             for node in nodes:
-                house = makeHousehold(node, areaJobs, info["numPeople"])
+                house = makeHousehold(node, areaJobs, info["numPeople"], pctWorkFromHome)
                 households.append(house)
                 if not house:
                     return False

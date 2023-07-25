@@ -66,6 +66,7 @@ The city is defined as a rectangular grid of zones containing nodes for building
 
 * `xLength` defines the dimension of the city in the x direction; **integer**
 * `yLength` defines the dimension of the city in the y direction; **integer**
+* `pctWorkFromHome` defines the percentage of people that work from home; **float**
 
 #### Zones 
 
@@ -75,7 +76,7 @@ The zones are defined in the json file under the base level key `zones` and each
 * `landAreaPct` is a percentage of the total city's area that this zone takes up; all the percentages must add up to 100%; **float**
 * `minBuildings` represents the minimum number of buildings in each area that is of the type of this zone; **integer**
 * `color` is the color of the zone in the plotting of city at the end of the generation; **string**
-* `type` can be either _housing_, `work`, or `leisure` to represent what occurs in each zone; agents will be sent to work in all zones of type `work` and `leisure`; **string**
+* `type` is a list containing all the types of activities that can take place in this zone. This allows for hierarchical zoning by adding multiple types. These types include `housing`, `work`, and `leisure`
 * `numWorkers` is the number of workers in each building of type 'working' or type 'leisure' zones; **integer**
 
 ## Conclusion

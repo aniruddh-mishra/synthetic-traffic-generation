@@ -1,7 +1,8 @@
 {
   "city": {
     "xLength": 1000,
-    "yLength": 1000
+    "yLength": 1000,
+    "pctWorkFromHome": 20
   },
   "zones": {
     "residential": {
@@ -9,7 +10,7 @@
       "landAreaPct": 0.5, 
       "minBuildings": 1, 
       "color": "red",
-      "type": "housing",
+      "types": ["housing"],
       "numPeople": [1, 6]
     }, 
     "industrial": {
@@ -17,7 +18,7 @@
       "landAreaPct": 0.1, 
       "minBuildings": 1, 
       "color": "orange",
-      "type": "work",
+      "types": ["work"],
       "numWorkers": 100
     }, 
     "commercial": {
@@ -25,7 +26,7 @@
       "landAreaPct": 0.1, 
       "minBuildings": 1, 
       "color": "green",
-      "type": "leisure",
+      "types": ["leisure", "work"],
       "numWorkers": 100
     }, 
     "apartment": {
@@ -33,7 +34,8 @@
       "landAreaPct": 0.2, 
       "minBuildings": 1, 
       "color": "blue",
-      "type": "housing",
+      "types": ["housing", "work"],
+      "numWorkers": 10,
       "numPeople": [100, 200]
     },
     "offices": {
@@ -41,7 +43,7 @@
       "landAreaPct": 0.05,
       "minBuildings": 1,
       "color": "brown",
-      "type": "work",
+      "types": ["work"],
       "numWorkers": 100
     },
     "schools": {
@@ -49,7 +51,7 @@
       "landAreaPct": 0.05,
       "minBuildings": 1,
       "color": "purple",
-      "type": "work",
+      "types": ["work"],
       "numWorkers": 1000
     }
   }
