@@ -6,8 +6,12 @@ from createJobs import genJobs
 from createHouseholds import genHouseholds
 from convertData import writeFiles
 import json
+import os
 
 def main():
+    os.system("rm -rf ./outputs/")
+    os.system("rm -rf ./output/")
+    os.system("mkdir ./output/")
     with open('config.json', 'r') as f:
         config = json.loads(f.read())
     
@@ -30,6 +34,9 @@ def main():
      return False
     writeFiles(zoneInfo, houseHolds, links)
     plt.legend(loc="upper left")
-    plt.show()
     
+    os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
+    plt.show()
+
+
 main()

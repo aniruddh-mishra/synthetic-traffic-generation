@@ -78,6 +78,8 @@ def createNetwork(zoneInfo, links):
     numLinks = 1
     for link in links:
         createLink(link, linksSection, numLinks, networkDoc, allNodes)
+        numLinks +=1
+        createLink([link[1], link[0]], linksSection, numLinks, networkDoc, allNodes)
         numLinks += 1
     
     writeFile(networkDoc, "network.xml")
