@@ -34,7 +34,7 @@ def genAllNodes(zones, plt):
         sampleArea = land[0]
         area = (sampleArea[2] - sampleArea[0]) ** 2
         buildingArea = info['area']
-        numNodes = int(area / buildingArea)
+        numNodes = round(area / buildingArea)
         nodes = genZoneNodes(land, numNodes, plt)
         print(numNodes * len(land), 'nodes made in', zone)
         zones[zone]['nodes'] = nodes

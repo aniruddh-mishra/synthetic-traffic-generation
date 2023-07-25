@@ -1,8 +1,7 @@
-import random
 from shapely import box
 from matplotlib.patches import Rectangle
 
-def genZones(dimensions, zones, plt):
+def genZones(dimensions, zones, plt, random):
     totalArea = dimensions[0] * dimensions[1]
     minArea = 0
     for zone, info in zones.items():
@@ -47,24 +46,14 @@ def plotZones(minLength, zones, plt):
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    dimensions = (1000, 1000)
-    zones = {
-            'res': {
-                'area': 200,
-                'landArea': 200000,
-                'color': 'red' 
-                },
-            'ind': {
-                'area': 3000,
-                'landArea': 200000,
-                'color': 'blue'
-                },
-            'com': {
-                'area': 300,
-                'landArea': 2000000,
-                'color': 'green'
-                }
-            }
-    genZones(dimensions, zones, plt)
+    import json
+    with open('config.json', 'r') as f:
+        info = json.load(f)
+
+    zoneInfo = info['zones']
+    city = info['city']
+    dimensions = city['xLength'], city['yLength']
+
+    genZones(dimensions, zoneInfo, plt)
     plt.legend()
     plt.show()

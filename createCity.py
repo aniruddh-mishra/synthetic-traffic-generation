@@ -7,6 +7,7 @@ from createHouseholds import genHouseholds
 from convertData import writeFiles
 import json
 import os
+import random
 
 def main():
     os.system("rm -rf ./outputs/")
@@ -25,7 +26,7 @@ def main():
     
     zoneInfo = config['zones']
 
-    genZones(cityDimensions, zoneInfo, plt)
+    genZones(cityDimensions, zoneInfo, plt, random.Random(3))
     genAllNodes(zoneInfo, plt)
     links = genAllLinks(1, zoneInfo, plt)
     jobs = genJobs(zoneInfo)
@@ -35,7 +36,7 @@ def main():
     writeFiles(zoneInfo, houseHolds, links)
     plt.legend(loc="upper left")
     
-    os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
+    # os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
     plt.show()
 
 

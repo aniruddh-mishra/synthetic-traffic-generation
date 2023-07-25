@@ -1,7 +1,7 @@
 {
   "city": {
-    "xLength": 1000,
-    "yLength": 1000,
+    "xLength": 5000,
+    "yLength": 5000,
     "pctWorkFromHome": 20
   },
   "zones": {
