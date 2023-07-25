@@ -6,10 +6,9 @@ def writeFiles(zoneInfo, households, links):
     createPopulation(households)
 
 def createPopulation(households):
-    populationDoc = minidom.Document()
+    populationDoc = minidom.parseString('<?xml version="1.0" ?><!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd"><plans xml:lang="de-CH"></plans>')
 
-    population = populationDoc.createElement('population')
-    populationDoc.appendChild(population)
+    population = populationDoc.childNodes[1]
 
     numPeople = 0
     for house in households:
@@ -37,12 +36,12 @@ def createPerson(person, doc, numPeople):
     createAct("home", person.house.location, plan, doc)
     return personXML
 
-def createAct(actType, location, planSection, doc, endTime=None, leg=None):
+def createAct(actType, location, planSection, doc, leg=None, endTime=None):
     action = doc.createElement('act')
     attributes = {
         "type": actType,
         "x": location[0],
-        "y": location[1],
+        "y": location[1]
     }
     if endTime:
         attributes["end_time"] = endTime
@@ -57,18 +56,19 @@ def createAct(actType, location, planSection, doc, endTime=None, leg=None):
         planSection.appendChild(legXML)
 
 def createNetwork(zoneInfo, links):
-    networkDoc = minidom.Document()
+    networkName = "synthetic city network"
+    networkDoc = minidom.parseString(f'<?xml version="1.0" encoding="utf-8"?><!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd"><network name="{networkName}"></network>')
 
-    network = networkDoc.createElement('network')
-    network.setAttribute('name', 'synthetic city network')
-    networkDoc.appendChild(network)
-    
+    network = networkDoc.childNodes[1]
+
     nodesSection = networkDoc.createElement('nodes')
     network.appendChild(nodesSection)
 
     numNodes = 0
     allNodes = []
     for zone, info in zoneInfo.items():
+        if not info.get('nodes'):
+            continue
         numNodes, nodesResult = createNodes(info["nodes"], nodesSection, numNodes, networkDoc)
         allNodes.extend(nodesResult)
 
@@ -94,7 +94,6 @@ def createLink(link, linksSection, numLinks, doc, allNodes):
         "length": distance,
         "capacity": 1800,
         "permlanes": 1,
-        "modes": "cars",
         "freespeed": 27.8
     }
     setAttributes(linkXML, attributes)

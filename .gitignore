@@ -9,6 +9,7 @@ __pycache__/
 # Setup for Simulation
 setup/*
 output/*
+outputs/*
 
 # Distribution / packaging
 .Python

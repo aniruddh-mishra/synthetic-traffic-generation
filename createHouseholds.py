@@ -5,6 +5,8 @@ def makeHousehold(node, areaJobs, numPeople):
     home = House(node)
     numMembers = random.randint(*numPeople)
     for member in range(numMembers):
+        if len(areaJobs.keys()) == 0:
+            continue
         job = findJob(areaJobs)
         if not job:
             print("Add more jobs to config.json, ran out of work")
@@ -32,6 +34,8 @@ def findJob(jobs):
 def genHouseholds(zones, jobs):
     households = []
     for zone, info in zones.items():
+        if not info.get('nodes'):
+            continue
         if info["type"] != "housing":
             continue
         for area, nodes in info["nodes"].items():

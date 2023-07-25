@@ -35,7 +35,9 @@ def genAllLinks(method, zones, plt):
     links = []
     counter = 1
     for zone, info in zones.items():
-        nodes = info['nodes']
+        nodes = info.get('nodes')
+        if not nodes:
+            continue
         for nodeSet in nodes.values():
             centralHub = random.choice(nodeSet)
             centralHubIndex = nodeSet.index(centralHub) + counter
