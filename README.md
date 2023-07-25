@@ -79,9 +79,17 @@ The zones are defined in the json file under the base level key `zones` and each
 * `type` is a list containing all the types of activities that can take place in this zone. This allows for hierarchical zoning by adding multiple types. These types include `housing`, `work`, and `leisure`; **string**
 * `numWorkers` is the number of workers in each building of type 'working' or type 'leisure' zones; **integer**
 
+#### Run Simulation
+
+After configuring the json file, the code can now be run with the following command from the directory of this repository:
+
+```bash
+python createCity.py
+```
+
 ## Conclusion
 
-After the execution of this script, you will see `.xml` files in your `output/` directory. You can now run the MATSIM simulation with the `config.xml` file in this directory as your configuration input. For more information follow the documentation on the [MATSIM website](https://matsim.org/downloads/).
+The `createCity.py` script also executes the matsim simulation with the output data. All of the results of the simulation can be found in the `outputs/` directory. With all of this information, a wrapper script could theoretically be made that configures the `config.json` file and analyzes the differences in results. Furthermore, a genetic algorithm or some other machine learning model can be used to find a more optimal zoning structure for existing cities.
 
 ## License
 This project uses a GNU General Public License v3. For more information, please look at the LICENSE file in this repository.
