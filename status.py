@@ -33,6 +33,8 @@ class StatusBar:
         if self.lastShownPct == 1:
             return
         self.progress = self.totalNum
+        if self.progress == 0:
+            return
         self.setETA()
         self.printStatus()
 

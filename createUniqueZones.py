@@ -6,7 +6,7 @@ def genZones(dimensions, zones, plt, random):
     totalArea = dimensions[0] * dimensions[1]
     minArea = 0
     for zone, info in zones.items():
-        if info['area'] > minArea or not minArea:
+        if info['area'] > minArea:
             minArea = info['area'] * info['minBuildings']
         zones[zone]['land'] = []
         zones[zone]['landArea'] = zones[zone]['landAreaPct'] * totalArea
@@ -38,7 +38,6 @@ def genZones(dimensions, zones, plt, random):
 
     statusBar.complete()
 
-
     plotZones(minLength, zones, plt)
     return zones
 
@@ -55,6 +54,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import json
     import random 
+    from createNodes import genAllNodes
 
     with open('config.json', 'r') as f:
         info = json.load(f)
@@ -64,5 +64,6 @@ if __name__ == "__main__":
     dimensions = city['xLength'], city['yLength']
 
     genZones(dimensions, zoneInfo, plt, random.Random(3))
+    genAllNodes(zoneInfo, plt)
     plt.legend()
     plt.show()

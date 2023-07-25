@@ -42,6 +42,8 @@ def genAllLinks(method, zones, plt):
         print(len(nodes.keys()), "areas in zone", zone)
         statusBar = StatusBar(len(nodes.keys()))
         for nodeSet in nodes.values():
+            if not nodeSet:
+                return
             centralHub = random.choice(nodeSet)
             centralHubIndex = nodeSet.index(centralHub) + counter
             linksResult, counter = genIntraZoneLinks(nodeSet, centralHub, plt, counter, centralHubIndex)
