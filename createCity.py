@@ -49,7 +49,7 @@ def main():
     plt.legend(loc="upper left")
    
     print("Running MATSIM simulation and generating plot...")
-    # os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
+    os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
     plt.show()
 
 
