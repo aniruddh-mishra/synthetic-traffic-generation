@@ -9,7 +9,7 @@ def genIntraZoneLinks(nodes, centralHub, plt, counter, centralHubIndex):
             continue
         dx, dy = [node[0], centralHub[0]], [node[1], centralHub[1]]
         links.append((counter, centralHubIndex))
-        plt.plot(dx, dy, color="black")
+        plt.plot(dx, dy, color="black", linewidth=1)
         counter += 1
     return links, counter
 
@@ -27,7 +27,7 @@ def genInterZoneLinks(centralHubs, plt):
             otherNodeIndex = centralHubs[hubIndex + 1][1]
             dx, dy = [otherCoordinate[0], coordinate[0]], [otherCoordinate[1], coordinate[1]]
         links.append((nodeIndex, otherNodeIndex))
-        plt.plot(dx, dy, color="white")
+        plt.plot(dx, dy, color="white", linewidth=1)
     return links
 
 def genAllLinks(method, zones, plt):
