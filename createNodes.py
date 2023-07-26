@@ -13,16 +13,30 @@ def genAllNodes(zones, cellLength, plt, subZoneInfo):
     return locations
 
 def nodeToLocations(node, info):
-    # TODO choose timings
     numResidents = None
     maxWorkers = None
     if "housing" in info['buildingTypes']:
         numResidents = random.randint(*info['numResidents'])
     else:
         maxWorkers = random.randint(*info['maxWorkers'])
-
-    location = Location(node, info['buildingTypes'], numResidents, maxWorkers)
     
+    location = Location(node, info['buildingTypes'], numResidents, maxWorkers)
+   
+    timings = info.get("timings")
+    if timings:
+        timingSpecific = {}
+        for typeTime, info in timings.items():
+            variation = info.get("normalTimeDistribution")
+            if not variation:
+                variation = 0
+           
+            start = random.gauss(info["time"][0], variation)
+            end = random.gauss(info["time"][1], variation)
+
+            timingSpecific[typeTime] = [start, end]
+
+        location.timings = timingSpecific
+
     return location
 
 def genCellNodes(region, cellLength, zoneInfo, plt, subZoneInfo):

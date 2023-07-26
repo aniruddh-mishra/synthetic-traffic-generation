@@ -12,7 +12,9 @@
       "maxWorkers": [9, 10],
       "numResidents": [100, 200],
       "timings": {
-        "work": [8, 21]
+        "work": {
+          "time": [8, 19]
+        }
       }
     }
   },
@@ -23,8 +25,7 @@
       "maxBuildings": 50, 
       "color": "red",
       "buildingTypes": ["housing"],
-      "numResidents": [1, 6],
-      "endTime": [5, 10]
+      "numResidents": [1, 6]
     }, 
     "industrial": {
       "buildingArea": 12000, 
@@ -35,7 +36,9 @@
       "subZones": ["apartment"],
       "maxWorkers": [90, 100],
       "timings": {
-        "work": [8, 16]
+        "work": {
+          "time": [8, 16]
+        }
       }
     }, 
     "commercial": {
@@ -46,8 +49,13 @@
       "buildingTypes": ["leisure", "work"],
       "maxWorkers": [80, 100],
       "timings": {
-        "leisure": [8, 22],
-        "work": [8, 22]
+        "leisure": {
+          "time": [8, 22],
+          "normalTimeDistribution": 1
+        },
+        "work": {
+          "time": [7, 22]
+        }
       }
     }, 
     "offices": {
@@ -59,8 +67,13 @@
       "maxWorkers": [70, 100],
       "subZones": ["apartment"],
       "timings": {
-        "work": [8, 16],
-        "leisure": [15, 21]
+        "work": {
+          "time": [8, 16],
+          "normalTimeDistribution": 1
+        },
+        "leisure": {
+          "time": [16, 22]
+        }
       }
     },
     "schools": {
@@ -71,7 +84,9 @@
       "buildingTypes": ["work"],
       "maxWorkers": [800, 1000],
       "timings": {
-        "work": [8, 16]
+        "work": {
+          "time": [8,16]
+        }
       }
     }
   }
