@@ -1,7 +1,106 @@
 import random
 from status import StatusBar
-from objects import Person, House
+from objects import Person
 
+def genPerson(house, sortedJobs, jobs, sortedLeisureLocations):
+    while True:
+        chosenJob = random.choices(sortedJobs, weights=[len(sortedJobs) - i for i, _ in enumerate(sortedJobs)])[0]
+        if not chosenJob.isHiring():
+            sortedJobs.remove(chosenJob)
+            jobs.remove(chosenJob)
+        else:
+            break
+
+    person = Person(house, chosenJob)
+    
+    timingsGuidelines = person.job.timings["work"]
+    timings = timingsGuidelines
+
+    variation = person.job.timings["peopleVariation"].get("work")
+    if variation:
+        deltaStart = abs(random.gauss(0, variation))
+        deltaEnd = abs(random.gauss(0, variation))
+        startTime = timingsGuidelines[0] + deltaStart
+        endTime = timingsGuidelines[1] + deltaEnd
+        timings = [startTime, endTime]
+
+    # TODO transport
+    transport = "car"
+
+    person.addToSchedule("work", person.job, timings, transport)
+
+    print(person)
+    return person
+
+def genHousehold(house, jobs, leisureLocations):
+    members = []
+    numResidents = house.numResidents
+    sortedJobs = sortLocations(house.location, jobs)
+    sortedLeisureLocations = sortLocations(house.location, leisureLocations)
+    for member in range(numResidents):
+        person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations)
+        if not person.job.isHiring():
+            jobs.remove(person.job)
+        members.append(person)
+    return members
+
+def sortLocations(reference, listLocations):
+    sortFunction = lambda location: pythagoreanTheorem(reference, location.location)
+    return sorted(listLocations, key=sortFunction)
+
+def pythagoreanTheorem(pointOne, pointTwo):
+    dx = pointOne[0] - pointTwo[0]
+    dy = pointOne[1] - pointTwo[1]
+    return (dx ** 2 + dy ** 2) ** 0.5
+
+def genHouseholds(locations):
+    homes, jobs, leisureLocations = bucketLocations(locations)
+    
+    statusBar = StatusBar(len(homes))
+    for house in homes:
+        genHousehold(house, jobs, leisureLocations)
+
+def bucketLocations(locations):
+    homes = []
+    jobs = []
+    leisureLocations = []
+    
+    for location in locations:
+        if "housing" in location.locationTypes:
+            homes.append(location)
+        
+        if "work" in location.locationTypes:
+            jobs.append(location)
+
+        if "leisureLocations" in location.locationTypes:
+            leisureLocations.append(location)
+
+    return homes, jobs, leisureLocations
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    import json
+    from createUniqueZones import genZones
+    from createNodes import genAllNodes
+
+    with open('config.json', 'r') as f:
+        info = json.load(f)
+
+    zoneInfo = info['zones']
+    city = info['city']
+    dimensions = city['xLength'], city['yLength']
+
+    cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random.Random(3))
+    print("Generating Nodes...")
+    locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'))
+    
+    genHouseholds(locations)
+
+    plt.plot(0, 0)
+    plt.legend(loc="upper left")
+    plt.show()
+
+"""
 def makeHousehold(node, areaJobs, numPeople, pctWorkFromHome, endTimeRange):
     home = House(node)
     numMembers = random.randint(*numPeople)
@@ -83,4 +182,4 @@ def pythagoreanTheorem(pointOne, pointTwo):
     dx = pointOne[0] - pointTwo[0]
     dy = pointOne[1] - pointTwo[1]
     return (dx ** 2 + dy ** 2) ** 0.5
-
+"""

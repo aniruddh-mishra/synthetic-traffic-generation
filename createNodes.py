@@ -4,12 +4,17 @@ from objects import Location
 
 def genAllNodes(zones, cellLength, plt, subZoneInfo):
     locations = []
+    statusBar = StatusBar(len(zones.keys()))
+
     for info in zones.values():
         if info.get('notAlone'):
             continue
         for region in info['land']:
             locations.extend(genCellNodes(region, cellLength, info, plt, subZoneInfo))
-    
+        statusBar.updateProgress()
+
+    statusBar.complete()
+
     return locations
 
 def nodeToLocations(node, info):
@@ -24,7 +29,9 @@ def nodeToLocations(node, info):
    
     timings = info.get("timings")
     if timings:
-        timingSpecific = {}
+        timingSpecific = {
+            "peopleVariation": {}
+        }
         for typeTime, info in timings.items():
             variation = info.get("normalTimeDistribution")
             if not variation:
@@ -34,6 +41,8 @@ def nodeToLocations(node, info):
             end = random.gauss(info["time"][1], variation)
 
             timingSpecific[typeTime] = [start, end]
+
+            timingSpecific["peopleVariation"][typeTime] = info.get("peopleVariation")
 
         location.timings = timingSpecific
 
@@ -97,6 +106,7 @@ if __name__ == "__main__":
     dimensions = city['xLength'], city['yLength']
 
     cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random.Random(3))
+    print("Generating Nodes...")
     locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'))
     for location in locations:
         print(location)

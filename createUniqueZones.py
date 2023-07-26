@@ -1,11 +1,10 @@
-from shapely import box
 from status import StatusBar
 from matplotlib.patches import Rectangle
 
 def genZones(dimensions, zoneInfo, subZones, plt, random):
     cellArea = 0
     zoneTypes = []
-    totalPct = 0
+    totalRatio = 0
 
     for info in subZones.values():
         if info['buildingArea'] > cellArea:
@@ -18,9 +17,9 @@ def genZones(dimensions, zoneInfo, subZones, plt, random):
         zoneTypes.append(zone)
         info['maxZoneArea'] = info['buildingArea'] * info['maxBuildings']
         info['land'] = []
-        totalPct += info['landAreaPct']
+        totalRatio += info['landAreaRatio']
    
-    if totalPct < 1:
+    if totalRatio < 1:
         print("Check config.json to make sure all zone percentages add up to 1")
         return
 
@@ -63,7 +62,7 @@ def genZones(dimensions, zoneInfo, subZones, plt, random):
     return cellLength
 
 def getRemainingCells(zone, totalCells):
-    remainingCells = zone['landAreaPct'] * totalCells
+    remainingCells = zone['landAreaRatio'] * totalCells
     return round(remainingCells)
 
 def addCells(numCells, zones, startPoint, zoneType, random):
