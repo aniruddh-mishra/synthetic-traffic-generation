@@ -2,54 +2,15 @@ from shapely import box
 from status import StatusBar
 from matplotlib.patches import Rectangle
 
-def genZones(dimensions, zones, plt, random):
-    totalArea = dimensions[0] * dimensions[1]
-    minArea = 0
-    for zone, info in zones.items():
-        if info['area'] > minArea:
-            minArea = info['area'] * info['minBuildings']
-        zones[zone]['land'] = []
-        zones[zone]['landArea'] = zones[zone]['landAreaPct'] * totalArea
-
-    minLength = minArea ** 0.5
-    numBoxes = (dimensions[1] / minLength) * (dimensions[0] / minLength)
-    statusBar = StatusBar(numBoxes)
-
-    x, y = (0, minLength)
-    zoneTypes = list(zones.keys())
-    weights = []
-    for zone in zoneTypes:
-        weights.append(zones[zone]['landArea'])
-    while True:
-        x += minLength
-        if x > dimensions[0]:
-            x = minLength
-            y += minLength
-        if y > dimensions[1] or len(zoneTypes) == 0:
-            break
-        zone = random.choices(zoneTypes, weights=weights)[0]
-        zones[zone]['land'].append((x - minLength, y - minLength, x, y))
-
-        if len(zones[zone]['land']) * minArea > zones[zone]['landArea']:
-            index = zoneTypes.index(zone)
-            zoneTypes.remove(zone)
-            weights.pop(index)
-        statusBar.updateProgress()
-
-    statusBar.complete()
-
-    plotZones(minLength, zones, plt)
-    return zones
-
-def genZonesNew(dimensions, zoneInfo, plt, random):
-    minArea = 0
+def genZones(dimensions, zoneInfo, plt, random):
+    cellArea = 0
     zoneTypes = []
     totalPct = 0
     for zone, info in zoneInfo.items():
-        if info['area'] > minArea:
-            minArea = info['area']
+        if info['area'] > cellArea:
+            cellArea = info['area']
         zoneTypes.append(zone)
-        info['minZoneArea'] = info['area'] * info['minBuildings']
+        info['maxZoneArea'] = info['area'] * info['maxBuildings']
         info['land'] = []
         totalPct += info['landAreaPct']
    
@@ -57,7 +18,7 @@ def genZonesNew(dimensions, zoneInfo, plt, random):
         print("Check config.json to make sure all zone percentages add up to 1")
         return
 
-    minLength = minArea ** 0.5
+    minLength = cellArea ** 0.5
     xNum = int(dimensions[0] / minLength)
     yNum = int(dimensions[1] / minLength)
     totalArea = dimensions[0] * dimensions[1]
@@ -69,29 +30,40 @@ def genZonesNew(dimensions, zoneInfo, plt, random):
             zoneRow.append(None)
         zones.append(zoneRow)
 
+    weights = []
+    for zone in zoneTypes:
+        score = getRemainingCells(zoneInfo[zone], cellArea, totalArea)
+        zoneInfo[zone]['maxNumCells'] = max(1, int(zoneInfo[zone]['maxZoneArea'] / cellArea))
+        weights.append(score / zoneInfo[zone]['maxNumCells'])
+
+    statusBar = StatusBar(len(zones))
     for rowIndex, row in enumerate(zones):
         for cellIndex, cell in enumerate(row):
             if not cell:
-                zoneType = random.choices(zoneTypes, weights=[getRemainingCells(zoneInfo[zoneType], minArea, totalArea) for zoneType in zoneTypes])[0]
-                numCells = max(1, int(zoneInfo[zoneType]['minZoneArea'] / minArea))
-               
-                remainingCells = getRemainingCells(zoneInfo[zoneType], minArea, totalArea)
+                zoneType = random.choices(zoneTypes, weights=weights)[0]
+                numCells = zoneInfo[zoneType]['maxNumCells'] 
+                remainingCells = getRemainingCells(zoneInfo[zoneType], cellArea, totalArea)
 
                 if remainingCells < numCells:
                     numCells = remainingCells
+                    zoneIndex = zoneTypes.index(zoneType)
                     zoneTypes.remove(zoneType)
+                    weights.pop(zoneIndex)
 
-                cells = addCells(numCells, zones, (cellIndex, rowIndex), zoneType)
+                cells = addCells(numCells, zones, (cellIndex, rowIndex), zoneType, random)
                 zoneInfo[zoneType]['land'].extend(cells)
-   
+        statusBar.updateProgress()
+
+    statusBar.complete()
+
     plotZones(minLength, zones, plt, zoneInfo)
 
-def getRemainingCells(zone, minArea, totalArea):
-    totalLand = len(zone['land']) * minArea
+def getRemainingCells(zone, cellArea, totalArea):
+    totalLand = len(zone['land']) * cellArea
     remainingLand = zone['landAreaPct'] * totalArea - totalLand
-    return round(remainingLand / minArea)
+    return round(remainingLand / cellArea)
 
-def addCells(numCells, zones, startPoint, zoneType):
+def addCells(numCells, zones, startPoint, zoneType, random):
     cellsAccounted = 1
     reach = 0
     allCells = [startPoint]
@@ -148,7 +120,7 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    genZonesNew(dimensions, zoneInfo, plt, random)
+    genZones(dimensions, zoneInfo, plt, random.Random(3))
     plt.plot(*dimensions)
     plt.legend()
     plt.show()
