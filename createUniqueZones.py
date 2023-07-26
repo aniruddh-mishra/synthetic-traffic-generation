@@ -126,6 +126,6 @@ if __name__ == "__main__":
     dimensions = city['xLength'], city['yLength']
 
     genZones(dimensions, zoneInfo, plt, random.Random(3))
-    plt.plot(*dimensions)
+    plt.plot(0, 0)
     plt.legend()
     plt.show()
