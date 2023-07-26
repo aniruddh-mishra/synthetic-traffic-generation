@@ -2,15 +2,21 @@ from shapely import box
 from status import StatusBar
 from matplotlib.patches import Rectangle
 
-def genZones(dimensions, zoneInfo, plt, random):
+def genZones(dimensions, zoneInfo, subZones, plt, random):
     cellArea = 0
     zoneTypes = []
     totalPct = 0
+
+    for info in subZones.values():
+        if info['buildingArea'] > cellArea:
+            cellArea = info['buildingArea']
+
     for zone, info in zoneInfo.items():
-        if info['area'] > cellArea:
-            cellArea = info['area']
+        if info['buildingArea'] > cellArea:
+            cellArea = info['buildingArea']
+
         zoneTypes.append(zone)
-        info['maxZoneArea'] = info['area'] * info['maxBuildings']
+        info['maxZoneArea'] = info['buildingArea'] * info['maxBuildings']
         info['land'] = []
         totalPct += info['landAreaPct']
    
@@ -18,10 +24,10 @@ def genZones(dimensions, zoneInfo, plt, random):
         print("Check config.json to make sure all zone percentages add up to 1")
         return
 
-    minLength = cellArea ** 0.5
-    xNum = int(dimensions[0] / minLength)
-    yNum = int(dimensions[1] / minLength)
-    totalArea = dimensions[0] * dimensions[1]
+    cellLength = cellArea ** 0.5
+    xNum = int(dimensions[0] / cellLength)
+    yNum = int(dimensions[1] / cellLength)
+    totalCells = xNum * yNum
 
     zones = []
     for y in range(yNum):
@@ -30,25 +36,22 @@ def genZones(dimensions, zoneInfo, plt, random):
             zoneRow.append(None)
         zones.append(zoneRow)
 
-    weights = []
-    for zone in zoneTypes:
-        score = getRemainingCells(zoneInfo[zone], cellArea, totalArea)
-        zoneInfo[zone]['maxNumCells'] = max(1, int(zoneInfo[zone]['maxZoneArea'] / cellArea))
-        weights.append(score / zoneInfo[zone]['maxNumCells'])
-
     statusBar = StatusBar(len(zones))
     for rowIndex, row in enumerate(zones):
         for cellIndex, cell in enumerate(row):
             if not cell:
+                weights = [] 
+                for zone in zoneTypes:
+                    remainingCells = getRemainingCells(zoneInfo[zone], totalCells)
+                    zoneInfo[zone]['maxNumCells'] = max(1, int(zoneInfo[zone]['maxZoneArea'] / cellArea))
+                    weights.append(remainingCells / zoneInfo[zone]['maxNumCells'])
+                
                 zoneType = random.choices(zoneTypes, weights=weights)[0]
-                numCells = zoneInfo[zoneType]['maxNumCells'] 
-                remainingCells = getRemainingCells(zoneInfo[zoneType], cellArea, totalArea)
-
+                numCells = zoneInfo[zoneType]['maxNumCells']
+                
                 if remainingCells < numCells:
                     numCells = remainingCells
-                    zoneIndex = zoneTypes.index(zoneType)
                     zoneTypes.remove(zoneType)
-                    weights.pop(zoneIndex)
 
                 cells = addCells(numCells, zones, (cellIndex, rowIndex), zoneType, random)
                 zoneInfo[zoneType]['land'].extend(cells)
@@ -56,12 +59,12 @@ def genZones(dimensions, zoneInfo, plt, random):
 
     statusBar.complete()
 
-    plotZones(minLength, zones, plt, zoneInfo)
+    plotZones(cellLength, zones, plt, zoneInfo)
+    return cellLength
 
-def getRemainingCells(zone, cellArea, totalArea):
-    totalLand = len(zone['land']) * cellArea
-    remainingLand = zone['landAreaPct'] * totalArea - totalLand
-    return round(remainingLand / cellArea)
+def getRemainingCells(zone, totalCells):
+    remainingCells = zone['landAreaPct'] * totalCells
+    return round(remainingCells)
 
 def addCells(numCells, zones, startPoint, zoneType, random):
     cellsAccounted = 1
@@ -71,10 +74,11 @@ def addCells(numCells, zones, startPoint, zoneType, random):
     while reach < len(zones):
         reach += 1
         adjacentCells = checkAdjacent(zones, startPoint, allCells)
-        if not adjacentCells and not previousAdjacent:
+        if not len(adjacentCells) and not previousAdjacent:
             break
-        if not adjacentCells:
+        if not len(adjacentCells):
             adjacentCells = previousAdjacent
+            continue
         else:
             previousAdjacent = adjacentCells
         if len(adjacentCells) > numCells - len(allCells):
@@ -102,16 +106,16 @@ def checkAdjacent(zones, startPoint, usedCells):
     
     return adjacentCells
 
-def plotZones(minLength, zones, plt, zonesInfo):
+def plotZones(cellLength, zones, plt, zonesInfo):
     labeledZones = []
     for rowIndex, row in enumerate(zones):
         for cellIndex, cell in enumerate(row):
-            startPoint = (cellIndex * minLength, rowIndex * minLength)
+            startPoint = (cellIndex * cellLength, rowIndex * cellLength)
             setLegend = True
             if cell in labeledZones:
                 setLegend = False
             labeledZones.append(cell)
-            plt.gca().add_patch(Rectangle(startPoint, minLength, minLength, facecolor=zonesInfo[cell]['color'], label=cell if setLegend else "__nolegend__"))
+            plt.gca().add_patch(Rectangle(startPoint, cellLength, cellLength, facecolor=zonesInfo[cell]['color'], label=cell if setLegend else "__nolegend__"))
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
@@ -125,7 +129,7 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    genZones(dimensions, zoneInfo, plt, random.Random(3))
+    genZones(dimensions, zoneInfo, info.get('subZones'), plt, random.Random(3))
     plt.plot(0, 0)
     plt.legend()
     plt.show()
