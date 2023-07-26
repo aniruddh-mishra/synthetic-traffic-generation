@@ -2,13 +2,14 @@ import random
 from status import StatusBar
 from objects import Person, House
 
-def makeHousehold(node, areaJobs, numPeople, pctWorkFromHome):
+def makeHousehold(node, areaJobs, numPeople, pctWorkFromHome, endTimeRange):
     home = House(node)
     numMembers = random.randint(*numPeople)
     for member in range(numMembers):
         workFromHome = random.random() < pctWorkFromHome
         if workFromHome:
             agent = Person(home, home)
+            agent.setLeaveWorkTime(endTimeRange)
         else:
             if len(areaJobs.keys()) == 0:
                 continue
@@ -18,6 +19,9 @@ def makeHousehold(node, areaJobs, numPeople, pctWorkFromHome):
                 return False
             agent = Person(home, job)
             job.addWorker(agent)
+            agent.setLeaveHomeTime(job.endTimeRange)
+
+        agent.setLeaveHomeTime(endTimeRange)
         home.addMember(agent)
     
     return home
@@ -47,7 +51,7 @@ def genHouseholds(zones, jobs, pctWorkFromHome):
         for area, nodes in info["nodes"].items():
             areaJobs = findCloseJobs(area, jobs)
             for node in nodes:
-                house = makeHousehold(node, areaJobs, info["numPeople"], pctWorkFromHome)
+                house = makeHousehold(node, areaJobs, info["numPeople"], pctWorkFromHome, info["endTime"])
                 households.append(house)
                 if not house:
                     statusBar.fail()

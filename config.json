@@ -8,51 +8,57 @@
     "residential": {
       "area": 5750, 
       "landAreaPct": 0.5, 
-      "minBuildings": 1, 
+      "maxBuildings": 50, 
       "color": "red",
       "types": ["housing"],
-      "numPeople": [1, 6]
+      "numPeople": [1, 6],
+      "endTime": [5, 10]
     }, 
     "industrial": {
       "area": 12000, 
       "landAreaPct": 0.1, 
-      "minBuildings": 1, 
+      "maxBuildings": 10, 
       "color": "orange",
       "types": ["work"],
-      "numWorkers": 100
+      "numWorkers": 100,
+      "endTime": [16.5, 18]
     }, 
     "commercial": {
       "area": 10000, 
       "landAreaPct": 0.1, 
-      "minBuildings": 1, 
+      "maxBuildings": 100, 
       "color": "green",
       "types": ["leisure", "work"],
-      "numWorkers": 100
+      "numWorkers": 100,
+      "endTime": [18, 22]
     }, 
     "apartment": {
       "area": 25000, 
       "landAreaPct": 0.2, 
-      "minBuildings": 1, 
+      "maxBuildings": 1, 
       "color": "blue",
       "types": ["housing", "work"],
       "numWorkers": 10,
-      "numPeople": [100, 200]
+      "numPeople": [100, 200],
+      "endTime": [5, 10]
     },
     "offices": {
       "area": 5000,
       "landAreaPct": 0.05,
-      "minBuildings": 1,
+      "maxBuildings": 2,
       "color": "brown",
       "types": ["work"],
-      "numWorkers": 100
+      "numWorkers": 100,
+      "endTime": [16, 18]
     },
     "schools": {
-      "area": 50000,
+      "area": 5000,
       "landAreaPct": 0.05,
-      "minBuildings": 1,
+      "maxBuildings": 1,
       "color": "purple",
       "types": ["work"],
-      "numWorkers": 1000
+      "numWorkers": 1000,
+      "endTime": [15, 18]
     }
   }
 }

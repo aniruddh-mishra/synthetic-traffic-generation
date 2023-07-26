@@ -36,8 +36,8 @@ def createPerson(person, doc, numPeople):
     personXML.appendChild(plan)
 
     # TODO Change completely
-    createAct("home", person.house.location, plan, doc, "car", "08:00:00")
-    createAct("work", person.work.location, plan, doc, "car", "17:30:00")
+    createAct("home", person.house.location, plan, doc, "car", person.getLeaveHomeTime())
+    createAct("work", person.work.location, plan, doc, "car", person.getLeaveWorkTime())
     createAct("home", person.house.location, plan, doc)
     return personXML
 
