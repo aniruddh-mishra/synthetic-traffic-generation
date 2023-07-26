@@ -67,11 +67,16 @@ def addCells(numCells, zones, startPoint, zoneType, random):
     cellsAccounted = 1
     reach = 0
     allCells = [startPoint]
+    previousAdjacent = None
     while reach < len(zones):
         reach += 1
         adjacentCells = checkAdjacent(zones, startPoint, allCells)
-        if not adjacentCells:
+        if not adjacentCells and not previousAdjacent:
             break
+        if not adjacentCells:
+            adjacentCells = previousAdjacent
+        else:
+            previousAdjacent = adjacentCells
         if len(adjacentCells) > numCells - len(allCells):
             allCells.extend(adjacentCells[:numCells - len(allCells)])
             break
