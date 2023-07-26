@@ -74,7 +74,7 @@ The zones are defined in the json file under the base level key `zones` and each
 
 * `area` defines the average area of a single building in this zone; **integer**
 * `landAreaPct` is a percentage of the total city's area that this zone takes up; all the percentages must add up to 100%; **float**
-* `minBuildings` represents the minimum number of buildings in each area that is of the type of this zone; **integer**
+* `maxBuildings` represents the maximum number of buildings in each area that is of the type of this zone (is only dependent on top zone for hierarchical zoning); **integer**
 * `color` is the color of the zone in the plotting of city at the end of the generation; **string**
 * `type` is a list containing all the types of activities that can take place in this zone. This allows for hierarchical zoning by adding multiple types. These types include `housing`, `work`, and `leisure`; **list of strings**
 * `numWorkers` is the number of workers in each building of a type 'working' zone; **integer**

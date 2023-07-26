@@ -35,3 +35,4 @@ class Location:
 
     def __str__(self):
         return f"This node is located at {self.location} and is of the type(s) {', '.join(self.locationTypes)}. It has {self.numResidents} residents and the maximum number of workers here is {self.maxWorkers}"
+
