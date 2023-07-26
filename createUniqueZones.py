@@ -140,7 +140,6 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import json
     import random 
-    from createNodes import genAllNodes
 
     with open('config.json', 'r') as f:
         info = json.load(f)
@@ -150,7 +149,6 @@ if __name__ == "__main__":
     dimensions = city['xLength'], city['yLength']
 
     genZonesNew(dimensions, zoneInfo, plt, random)
-    # genAllNodes(zoneInfo, plt)
     plt.plot(*dimensions)
     plt.legend()
     plt.show()
