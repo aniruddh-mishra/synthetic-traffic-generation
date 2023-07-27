@@ -2,46 +2,93 @@ import random
 from status import StatusBar
 from objects import Person
 
-def genPerson(house, sortedJobs, jobs, sortedLeisureLocations):
-    while True:
-        chosenJob = random.choices(sortedJobs, weights=[len(sortedJobs) - i for i, _ in enumerate(sortedJobs)])[0]
-        if not chosenJob.isHiring():
-            sortedJobs.remove(chosenJob)
-            jobs.remove(chosenJob)
-        else:
-            break
+def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio, workFromHomeTiming):
+    workFromHome = random.random() < workFromHomeRatio
+    if workFromHome:
+        chosenJob = house 
+    else:
+        while True:
+            chosenJob = random.choices(sortedJobs, weights=[len(sortedJobs) - i for i, _ in enumerate(sortedJobs)])[0]
+            if not chosenJob.isHiring():
+                sortedJobs.remove(chosenJob)
+                jobs.remove(chosenJob)
+            else:
+                break
+ 
 
     person = Person(house, chosenJob)
-    
-    timingsGuidelines = person.job.timings["work"]
-    timings = timingsGuidelines
+   
+    if workFromHome:
+        timings = workFromHomeTiming
+    else: 
+        timingsGuidelines = person.job.timings["work"]["time"]
+        timings = timingsGuidelines
 
-    variation = person.job.timings["peopleVariation"].get("work")
-    if variation:
-        deltaStart = abs(random.gauss(0, variation))
-        deltaEnd = abs(random.gauss(0, variation))
-        startTime = timingsGuidelines[0] + deltaStart
-        endTime = timingsGuidelines[1] + deltaEnd
-        timings = [startTime, endTime]
+        variation = person.job.timings["work"].get("peopleVariation")
+        if variation:
+            deltaStart = abs(random.gauss(0, variation))
+            deltaEnd = abs(random.gauss(0, variation))
+            startTime = timingsGuidelines[0] + deltaStart
+            startTime = min(max(startTime, timingsGuidelines[0] - variation), timingsGuidelines[0] + variation)
+            endTime = timingsGuidelines[1] + deltaEnd
+            endTime = min(max(endTime, timingsGuidelines[1] - variation), timingsGuidelines[1] + variation)
+            timings = [startTime, endTime]
+            if startTime > endTime:
+                timings = timingsGuidelines
 
     # TODO transport
     transport = "car"
 
     person.addToSchedule("work", person.job, timings, transport)
 
-    print(person)
+    sortedLeisureLocations = sortedLeisureLocations.copy()
+  
+    while True:
+        chooseLeisure = random.randint(1, 3) != 1
+        if not chooseLeisure:
+            break
+    
+        while True:
+            if not len(sortedLeisureLocations):
+                return person
+
+            weights = []
+            for i, _ in enumerate(sortedLeisureLocations):
+                weights.append(len(sortedLeisureLocations) - i)
+           
+            chosenActivity = random.choices(sortedLeisureLocations, weights=weights)[0]
+            activityTimings = chosenActivity.timings["leisure"]["time"].copy()
+            if activityTimings[1] < person.getNextAvailable():
+                sortedLeisureLocations.remove(chosenActivity)
+            else:
+                variation = chosenActivity.timings["leisure"].get("peopleVariation")
+                activityTimings[0] = max(activityTimings[0], person.getNextAvailable())
+                averageDuration = chosenActivity.timings["leisure"].get("averageDuration")
+                endTime = activityTimings[0] + averageDuration
+                if variation:
+                    delta = min(max(0, random.gauss(0, variation)), variation)
+                    endTime += delta
+                activityTimings[1] = min(activityTimings[1], endTime)
+                if activityTimings[1] <= activityTimings[0]:
+                    return person
+                break
+        
+        person.addToSchedule("leisure", chosenActivity, activityTimings, transport)
+        sortedLeisureLocations.remove(chosenActivity)
+
     return person
 
-def genHousehold(house, jobs, leisureLocations):
+def genHousehold(house, jobs, leisureLocations, cityData, statusBar):
     members = []
     numResidents = house.numResidents
     sortedJobs = sortLocations(house.location, jobs)
     sortedLeisureLocations = sortLocations(house.location, leisureLocations)
     for member in range(numResidents):
-        person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations)
+        person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData["workFromHomeRatio"], cityData.get("workFromHomeTiming"))
         if not person.job.isHiring():
             jobs.remove(person.job)
         members.append(person)
+        statusBar.updateProgress()
     return members
 
 def sortLocations(reference, listLocations):
@@ -53,12 +100,21 @@ def pythagoreanTheorem(pointOne, pointTwo):
     dy = pointOne[1] - pointTwo[1]
     return (dx ** 2 + dy ** 2) ** 0.5
 
-def genHouseholds(locations):
+def genHouseholds(locations, cityData):
     homes, jobs, leisureLocations = bucketLocations(locations)
-    
-    statusBar = StatusBar(len(homes))
+   
+    totalPopulation = 0 
     for house in homes:
-        genHousehold(house, jobs, leisureLocations)
+        totalPopulation += house.numResidents
+
+    people = []
+    statusBar = StatusBar(totalPopulation)
+    for house in homes:
+        people.extend(genHousehold(house, jobs, leisureLocations, cityData, statusBar))
+
+    statusBar.complete()
+    
+    return people
 
 def bucketLocations(locations):
     homes = []
@@ -72,7 +128,7 @@ def bucketLocations(locations):
         if "work" in location.locationTypes:
             jobs.append(location)
 
-        if "leisureLocations" in location.locationTypes:
+        if "leisure" in location.locationTypes:
             leisureLocations.append(location)
 
     return homes, jobs, leisureLocations
@@ -94,92 +150,16 @@ if __name__ == "__main__":
     print("Generating Nodes...")
     locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'))
     
-    genHouseholds(locations)
+    people = genHouseholds(locations, city)
+
+    totalPopulation = 0
+    for person in people:
+        print(person)
+        totalPopulation += 1
+
+
+    print(f"This city has {totalPopulation} people")
 
     plt.plot(0, 0)
     plt.legend(loc="upper left")
     plt.show()
-
-"""
-def makeHousehold(node, areaJobs, numPeople, pctWorkFromHome, endTimeRange):
-    home = House(node)
-    numMembers = random.randint(*numPeople)
-    for member in range(numMembers):
-        workFromHome = random.random() < pctWorkFromHome
-        if workFromHome:
-            agent = Person(home, home)
-            agent.setLeaveWorkTime(endTimeRange)
-        else:
-            if len(areaJobs.keys()) == 0:
-                continue
-            job = findJob(areaJobs)
-            if not job:
-                print("Add more jobs to config.json, ran out of work")
-                return False
-            agent = Person(home, job)
-            job.addWorker(agent)
-            agent.setLeaveHomeTime(job.endTimeRange)
-
-        agent.setLeaveHomeTime(endTimeRange)
-        home.addMember(agent)
-    
-    return home
-
-def findJob(jobs):
-    jobs = jobs.copy()
-    jobTypes = list(jobs.keys())
-    jobType = random.choice(jobTypes)
-    jobsInType = jobs[jobType]
-    for areaJobs in jobsInType:
-        for job in areaJobs:
-            if job.hiring:
-                return job
-    jobs.pop(jobType)
-    if len(jobs.keys()) == 0:
-        return False
-    return findJob(jobs)
-
-def genHouseholds(zones, jobs, pctWorkFromHome):
-    households = []
-    statusBar = StatusBar(len(zones.keys()))
-    for zone, info in zones.items():
-        if not info.get('nodes'):
-            continue
-        if "housing" not in info["types"]:
-            continue
-        for area, nodes in info["nodes"].items():
-            areaJobs = findCloseJobs(area, jobs)
-            for node in nodes:
-                house = makeHousehold(node, areaJobs, info["numPeople"], pctWorkFromHome, info["endTime"])
-                households.append(house)
-                if not house:
-                    statusBar.fail()
-                    return False
-        statusBar.updateProgress()
-
-    statusBar.complete()
-    return households
-
-def findCloseJobs(area, jobs):
-    centralArea = centerOfArea(area)
-    jobs = jobs.copy()
-    jobs.sort(key=lambda jobArea: pythagoreanTheorem(centerOfArea(jobArea[0].area), centralArea))
-    classifiedJobs = {}
-    for jobSet in jobs:
-        jobType = jobSet[0].type
-        if not classifiedJobs.get(jobType):
-            classifiedJobs[jobType] = []
-        classifiedJobs[jobType].append(jobSet)
-
-    return classifiedJobs
-
-def centerOfArea(area): 
-    centerX = (area[2] + area[0]) / 2
-    centerY = (area[3] + area[1]) / 2
-    return (centerX, centerY)
-
-def pythagoreanTheorem(pointOne, pointTwo):
-    dx = pointOne[0] - pointTwo[0]
-    dy = pointOne[1] - pointTwo[1]
-    return (dx ** 2 + dy ** 2) ** 0.5
-"""

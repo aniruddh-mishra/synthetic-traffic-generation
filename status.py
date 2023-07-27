@@ -8,7 +8,7 @@ class StatusBar:
         self.characterComplete = characterComplete
         self.characterInComplete = characterInComplete
         self.progress = 0
-        self.lastShownPct = 0
+        self.lastShown = None
         self.averageTime = None
         self.ETA = None
         self.startTime = time.perf_counter()
@@ -22,15 +22,15 @@ class StatusBar:
 
     def updateProgress(self, progress=1):
         self.progress += progress
-        pct = self.progress / self.totalNum
         self.setETA()
-        if self.lastShownPct + 0.1 > pct:
+        now = time.perf_counter()
+        if self.lastShown and now - self.lastShown < 1 and self.progress != self.totalNum:
             return 
-        self.lastShownPct = pct
+        self.lastShown = now
         self.printStatus()
     
     def complete(self):
-        if self.lastShownPct == 1:
+        if self.progress == self.totalNum:
             return
         self.progress = self.totalNum
         if self.progress == 0:
@@ -54,14 +54,14 @@ class StatusBar:
 
         print(stringPrint)
 
-        if self.ETA and self.progress != self.totalNum:
-            sys.stdout.write("\033[K")
+        if self.ETA and self.progress != self.totalNum: 
             sys.stdout.write("\033[F")
+            sys.stdout.write("\033[K")
 
 if __name__ == "__main__":
     bar = StatusBar(10, 10)
     for i in range(10):
-        time.sleep(0.5)
+        time.sleep(2)
         bar.updateProgress()
     bar.complete()
 

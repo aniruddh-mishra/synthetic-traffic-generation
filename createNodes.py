@@ -29,23 +29,26 @@ def nodeToLocations(node, info):
    
     timings = info.get("timings")
     if timings:
-        timingSpecific = {
-            "peopleVariation": {}
-        }
+        timingSpecific = {}
         for typeTime, info in timings.items():
             variation = info.get("normalTimeDistribution")
             if not variation:
                 variation = 0
            
-            start = random.gauss(info["time"][0], variation)
-            end = random.gauss(info["time"][1], variation)
-
-            timingSpecific[typeTime] = [start, end]
-
-            timingSpecific["peopleVariation"][typeTime] = info.get("peopleVariation")
+            start = abs(random.gauss(info["time"][0], variation))
+            start = min(info["time"][0] + variation, max(info["time"][0] - variation, start))
+            end = abs(random.gauss(info["time"][1], variation))
+            end = min(info["time"][1] + variation, max(info["time"][1] - variation, end))
+            
+            if end < start:
+                start = info["time"][0]
+                end = info["time"][1]
+           
+            info = info.copy()
+            info["time"] = [start, end]
+            timingSpecific[typeTime] = info
 
         location.timings = timingSpecific
-
     return location
 
 def genCellNodes(region, cellLength, zoneInfo, plt, subZoneInfo):
@@ -108,8 +111,8 @@ if __name__ == "__main__":
     cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random.Random(3))
     print("Generating Nodes...")
     locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'))
-    for location in locations:
-        print(location)
+    # for location in locations:
+    #    print(location)
     plt.plot(0, 0)
     plt.legend(loc="upper left")
     plt.show()

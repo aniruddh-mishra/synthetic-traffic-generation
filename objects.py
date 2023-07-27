@@ -5,29 +5,26 @@ class Person:
         self.schedule = []
 
     def getNextAvailable(self):
-        scheduleTasks = list(self.schedule.values())
-        return scheduleTasks[-1][1]
+        timings = [task["times"] for task in self.schedule]
+        return timings[-1][1]
 
     def addToSchedule(self, actionType, location, times, transport):
         task = {
             "actionType": actionType,
             "location": location,
             "times": times,
-            "transportTo": transport
+            "legMode": transport
         }
         self.schedule.append(task)
 
-    def addAction(self, action, location, timeOption, transport):
-        self.actions.append({
-                "actionType": action,
-                "location": location,
-                "time": timeOption,
-                "legMode": transport
-            })
-        self.actions.sort(key=lambda action: action["time"]["startTime"])
-
     def __str__(self):
-        return f"This person has the following schedule: {self.schedule}" 
+        returnString = "Here's some information about this person:\n\n\t* This person has the following schedule: \n"
+        counter = 0
+        for task in self.schedule:
+            counter += 1
+            returnString += "\t\t" + str(counter) + ". " + task["actionType"] + " at " + str(task["location"].location) + " from " + str(task["times"][0]) + " to " + str(task["times"][1]) + "\n"
+        returnString += "\n\t* This person lives at " + str(self.house.location)
+        return returnString + "\n"
 
 class Location:
     def __init__(self, location, locationTypes, numResidents=None, maxWorkers=None):

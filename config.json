@@ -3,7 +3,8 @@
     "xLength": 5000,
     "yLength": 5000,
     "workFromHomeRatio": 0.2,
-    "homesWithCarsRatio": 0.2
+    "homesWithCarsRatio": 0.2,
+    "workFromHomeTiming": [9, 17]
   },
   "subZones": {
     "apartment": {
@@ -53,10 +54,12 @@
       "timings": {
         "leisure": {
           "time": [8, 22],
-          "normalTimeDistribution": 1
+          "normalTimeDistribution": 1,
+          "averageDuration": 4
         },
         "work": {
-          "time": [7, 22]
+          "time": [7, 22],
+          "normalTimeDistribution": 1.5
         }
       }
     }, 
@@ -74,7 +77,9 @@
           "normalTimeDistribution": 1
         },
         "leisure": {
-          "time": [16, 22]
+          "time": [16, 24],
+          "averageDuration": 1,
+          "normalTimeDistribution": 2
         }
       }
     },
