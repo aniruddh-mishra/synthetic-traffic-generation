@@ -24,9 +24,10 @@ def genAllNodes(zones, cellLength, plt, subZoneInfo, random):
 def nodeToLocations(node, info, random, zoneType):
     numResidents = None
     maxWorkers = None
-    if "housing" in info['buildingTypes']:
+    if info.get("numResidents"):
         numResidents = random.randint(*info['numResidents'])
-    else:
+    
+    if info.get("maxWorkers"):
         maxWorkers = random.randint(*info['maxWorkers'])
     
     location = Location(node, info['buildingTypes'], zoneType, numResidents, maxWorkers)

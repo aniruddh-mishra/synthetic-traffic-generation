@@ -3,6 +3,7 @@ class Person:
         self.house = house
         self.job = job
         self.schedule = []
+        self.workFromHome = False
 
     def getNextAvailable(self):
         timings = [task["times"] for task in self.schedule]
@@ -36,11 +37,8 @@ class Location:
         self.timings = None
         self.workers = []
 
-    def addMember(self, agent):
-        if self.maxWorkers and len(self.workers) >= self.maxWorkers:
-            return False
+    def addWorker(self, agent):
         self.workers.append(agent)
-        return True
 
     def isHiring(self):
         return not self.maxWorkers or len(self.workers) < self.maxWorkers

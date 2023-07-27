@@ -9,6 +9,7 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
         while True:
             if not len(sortedJobs):
                 chosenJob = house
+                workFromHome = True
                 print("Ran out of jobs, adding extra work from home person.")
                 break
             chosenJob = random.choices(sortedJobs, weights=[len(sortedJobs) - i for i, _ in enumerate(sortedJobs)])[0]
@@ -18,9 +19,10 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
             else:
                 break
  
-
     person = Person(house, chosenJob)
-   
+    chosenJob.addWorker(person)
+    person.workFromHome = workFromHome
+
     if workFromHome:
         timings = workFromHomeTiming
     else: 
@@ -88,8 +90,9 @@ def genHousehold(house, jobs, leisureLocations, cityData, statusBar, random):
     sortedLeisureLocations = sortLocations(house.location, leisureLocations)
     for member in range(numResidents):
         person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData["workFromHomeRatio"], cityData.get("workFromHomeTiming"), random)
-        if not person.job.isHiring():
+        if not person.job.isHiring() and not person.workFromHome:
             jobs.remove(person.job)
+            sortedJobs.remove(person.job)
         members.append(person)
         statusBar.updateProgress()
     return members
