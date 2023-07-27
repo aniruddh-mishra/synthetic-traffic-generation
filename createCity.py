@@ -40,11 +40,11 @@ def main():
     agentsRandom = getRandom("agents", seeds)
     people = genHouseholds(locations, cityInfo, agentsRandom)
    
-    """
     print("Generating links between nodes...")
     linksRandom = getRandom("links", seeds)
-    links = genAllLinks(1, zoneInfo, plt)
-
+    links = genAllLinks(1, zoneInfo, plt, linksRandom)
+    
+    """
     print("Converting data to MATSIM format")
     writeFiles(zoneInfo, houseHolds, links)
    

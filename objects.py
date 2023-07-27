@@ -23,15 +23,16 @@ class Person:
         counter = 0
         for task in self.schedule:
             counter += 1
-            returnString += "\t\t" + str(counter) + ". " + task["actionType"] + " at " + str(task["location"].location) + " from " + str(task["times"][0]) + " to " + str(task["times"][1]) + "\n"
+            returnString += "\t\t" + str(counter) + ". " + task["actionType"] + " located at " + str(task["location"].location) + " from " + str(task["times"][0]) + " to " + str(task["times"][1]) + "\n"
         returnString += "\n\t* This person lives at " + str(self.house.location)
         return returnString + "\n"
 
 class Location:
-    def __init__(self, location, locationTypes, zone, numResidents=None, maxWorkers=None):
+    def __init__(self, location, locationTypes, zone, region, numResidents=None, maxWorkers=None):
         self.location = location
         self.locationTypes = locationTypes
         self.zone = zone
+        self.region = region
         self.numResidents = numResidents
         self.maxWorkers = maxWorkers
         self.timings = None

@@ -5,18 +5,21 @@
     "agents": 1690477925.336275
   },
   "city": {
-    "xLength": 500,
-    "yLength": 500,
+    "xLength": 1000,
+    "yLength": 1000,
     "workFromHomeRatio": 0.2,
     "homesWithCarsRatio": 0.2,
     "workFromHomeTiming": [9, 17]
+  },
+  "links": {
+    "numCentralHubs": [3, 5]
   },
   "subZones": {
     "apartment": {
       "color": "blue",
       "buildingArea": 6000, 
       "buildingTypes": ["housing", "work"],
-      "maxWorkers": [1, 1],
+      "maxWorkers": [9, 10],
       "numResidents": [100, 200],
       "timings": {
         "work": {
@@ -27,7 +30,7 @@
   },
   "zones": {
     "residential": {
-      "buildingArea": 5750, 
+      "buildingArea": 7000, 
       "landAreaRatio": 0.7, 
       "maxBuildings": 50, 
       "color": "red",
@@ -41,7 +44,7 @@
       "color": "orange",
       "buildingTypes": ["work"],
       "subZones": ["apartment"],
-      "maxWorkers": [1, 1],
+      "maxWorkers": [90, 100],
       "timings": {
         "work": {
           "time": [8, 16],
@@ -55,7 +58,7 @@
       "maxBuildings": 100, 
       "color": "green",
       "buildingTypes": ["leisure", "work"],
-      "maxWorkers": [1, 1],
+      "maxWorkers": [80, 100],
       "timings": {
         "leisure": {
           "time": [8, 22],
@@ -74,7 +77,7 @@
       "maxBuildings": 2,
       "color": "brown",
       "buildingTypes": ["work", "leisure"],
-      "maxWorkers": [1, 1],
+      "maxWorkers": [70, 100],
       "subZones": ["apartment"],
       "timings": {
         "work": {
@@ -94,7 +97,7 @@
       "maxBuildings": 1,
       "color": "purple",
       "buildingTypes": ["work"],
-      "maxWorkers": [1, 1],
+      "maxWorkers": [80, 100],
       "timings": {
         "work": {
           "time": [8,16]

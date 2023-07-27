@@ -1,6 +1,65 @@
 import random
 from status import StatusBar
 
+def genAllLinks(linkConfigs, locations, plt, random):
+    currentRegion = None
+    regionLocations = []
+    for location in locations:
+        if currentRegion and location.region != currentRegion:
+            currentRegion = location.region
+            numCentralHubs = 1
+            if linkConfigs.get("numCentralHubs"):
+                numCentralHubs = random.randint(*linkConfigs.get("numCentralHubs"))
+            genInterRegionLinks(numCentralHubs, regionLocations, plt)
+            regionLocations = []
+        elif location.region != currentRegion:
+            currentRegion = location.region
+        regionLocations.append(location)
+    currentRegion = location.region
+    numCentralHubs = 1
+    if linkConfigs.get("numCentralHubs"):
+        numCentralHubs = random.randint(*linkConfigs.get("numCentralHubs"))
+    genInterRegionLinks(numCentralHubs, regionLocations, plt)
+
+def genInterRegionLinks(numCentralHubs, regionNodes, plt):
+    numCentralHubs = min(len(regionNodes), numCentralHubs)
+    centralHubs = random.sample(regionNodes, numCentralHubs)
+    links = []
+    for hub in centralHubs:
+        for node in regionNodes:
+            if node == hub:
+                continue
+            links.append([node.location, hub.location])
+            plt.plot([node.location[0], hub.location[0]], [node.location[1], hub.location[1]], color="black", linewidth=1)
+
+    return links
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    import json
+    from createUniqueZones import genZones
+    from createNodes import genAllNodes
+    from createHouseholds import genHouseholds
+    import random
+
+    with open('config.json', 'r') as f:
+        info = json.load(f)
+
+    zoneInfo = info['zones']
+    city = info['city']
+    dimensions = city['xLength'], city['yLength']
+
+    cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
+    print("Generating Nodes...")
+    locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
+    
+    genAllLinks(info.get('links'), locations, plt, random)
+
+    plt.plot(0, 0)
+    plt.legend(loc="upper left")
+    plt.show()
+
+"""
 def genIntraZoneLinks(nodes, centralHub, plt, counter, centralHubIndex):
     links = []
     for node in nodes:
@@ -57,3 +116,4 @@ def genAllLinks(method, zones, plt):
     random.shuffle(hubs)
     links.extend(genInterZoneLinks(hubs, plt))
     return links
+"""

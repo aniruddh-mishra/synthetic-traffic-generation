@@ -21,7 +21,7 @@ def genAllNodes(zones, cellLength, plt, subZoneInfo, random):
 
     return locations
 
-def nodeToLocations(node, info, random, zoneType):
+def nodeToLocations(node, info, random, zoneType, region):
     numResidents = None
     maxWorkers = None
     if info.get("numResidents"):
@@ -30,7 +30,7 @@ def nodeToLocations(node, info, random, zoneType):
     if info.get("maxWorkers"):
         maxWorkers = random.randint(*info['maxWorkers'])
     
-    location = Location(node, info['buildingTypes'], zoneType, numResidents, maxWorkers)
+    location = Location(node, info['buildingTypes'], zoneType, region, numResidents, maxWorkers)
    
     timings = info.get("timings")
     if timings:
@@ -98,9 +98,9 @@ def genCellNodes(region, cellLength, zoneInfo, plt, subZoneInfo, random, regions
             coordinate = (random.uniform(minX, maxX),  random.uniform(minY, maxY))
             if coordinate not in cellNodes:
                 break
-
+    
         cellNodes.append(coordinate)
-        locations.append(nodeToLocations(coordinate, buildingInfo, random, zoneType))
+        locations.append(nodeToLocations(coordinate, buildingInfo, random, zoneType, region))
         plt.plot(*coordinate, marker="*", markersize=1, color=color)
    
     return locations
