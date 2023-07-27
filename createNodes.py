@@ -1,23 +1,27 @@
-import random
 from status import StatusBar
 from objects import Location
 
-def genAllNodes(zones, cellLength, plt, subZoneInfo):
+def genAllNodes(zones, cellLength, plt, subZoneInfo, random):
     locations = []
+    regions = {}
     statusBar = StatusBar(len(zones.keys()))
 
-    for info in zones.values():
+    for zone, info in zones.items():
         if info.get('notAlone'):
             continue
         for region in info['land']:
-            locations.extend(genCellNodes(region, cellLength, info, plt, subZoneInfo))
+            cellLocations = genCellNodes(region, cellLength, info, plt, subZoneInfo, random, regions, zone)
+            locations.extend(cellLocations)
+            regions[region] = cellLocations
         statusBar.updateProgress()
 
     statusBar.complete()
 
+    del regions
+
     return locations
 
-def nodeToLocations(node, info):
+def nodeToLocations(node, info, random, zoneType):
     numResidents = None
     maxWorkers = None
     if "housing" in info['buildingTypes']:
@@ -25,7 +29,7 @@ def nodeToLocations(node, info):
     else:
         maxWorkers = random.randint(*info['maxWorkers'])
     
-    location = Location(node, info['buildingTypes'], numResidents, maxWorkers)
+    location = Location(node, info['buildingTypes'], zoneType, numResidents, maxWorkers)
    
     timings = info.get("timings")
     if timings:
@@ -49,9 +53,10 @@ def nodeToLocations(node, info):
             timingSpecific[typeTime] = info
 
         location.timings = timingSpecific
+    
     return location
 
-def genCellNodes(region, cellLength, zoneInfo, plt, subZoneInfo):
+def genCellNodes(region, cellLength, zoneInfo, plt, subZoneInfo, random, regions, zoneType):
     buildingArea = zoneInfo['buildingArea']
     subZones = zoneInfo.get('subZones')
     
@@ -73,17 +78,20 @@ def genCellNodes(region, cellLength, zoneInfo, plt, subZoneInfo):
             break
 
         buildingType = random.choice(buildingTypes)
-        if len(cellNodes) == 0:
+        if not neighborHasTop(region, regions, zoneType, locations):
             buildingType = "top"
 
+        color = "white"
         buildingInfo = zoneInfo
         if buildingType != "top":
             buildingInfo = subZoneInfo[buildingType]
             color = buildingInfo['color']
         
-        coveredArea += buildingInfo['buildingArea']
-        if cellArea - coveredArea <= buildingInfo['buildingArea']:
+        if cellArea - coveredArea < buildingInfo['buildingArea']:
             buildingTypes.remove(buildingType)
+            continue
+      
+        coveredArea += buildingInfo['buildingArea']
         
         while True:
             coordinate = (random.uniform(minX, maxX),  random.uniform(minY, maxY))
@@ -91,15 +99,34 @@ def genCellNodes(region, cellLength, zoneInfo, plt, subZoneInfo):
                 break
 
         cellNodes.append(coordinate)
-        locations.append(nodeToLocations(coordinate, buildingInfo))
+        locations.append(nodeToLocations(coordinate, buildingInfo, random, zoneType))
         plt.plot(*coordinate, marker="*", markersize=1, color=color)
-    
+   
     return locations
+
+def neighborHasTop(region, regions, topZone, currentLocations):
+    neighbors = [(-1, 0), (0, 1), (0, -1), (1, 0)]
+    for neighbor in neighbors:
+        regionCoordinates = region[0] + neighbor[0], region[1] + neighbor[1]
+        locations = regions.get(regionCoordinates)
+        if not locations:
+            continue
+        for location in locations:
+            if location.zone == topZone:
+                return True
+  
+    if len(currentLocations):
+        for location in currentLocations:
+            if location.zone == topZone:
+                return True
+
+    return False
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import json
     from createUniqueZones import genZones
+    import random
 
     with open('config.json', 'r') as f:
         info = json.load(f)
@@ -108,11 +135,11 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random.Random(3))
+    cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
     print("Generating Nodes...")
-    locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'))
-    # for location in locations:
-    #    print(location)
+    locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
+    for location in locations:
+        print(location)
     plt.plot(0, 0)
     plt.legend(loc="upper left")
     plt.show()

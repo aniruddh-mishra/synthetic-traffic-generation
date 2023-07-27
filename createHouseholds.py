@@ -1,13 +1,16 @@
-import random
 from status import StatusBar
 from objects import Person
 
-def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio, workFromHomeTiming):
+def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio, workFromHomeTiming, random):
     workFromHome = random.random() < workFromHomeRatio
     if workFromHome:
         chosenJob = house 
     else:
         while True:
+            if not len(sortedJobs):
+                chosenJob = house
+                print("Ran out of jobs, adding extra work from home person.")
+                break
             chosenJob = random.choices(sortedJobs, weights=[len(sortedJobs) - i for i, _ in enumerate(sortedJobs)])[0]
             if not chosenJob.isHiring():
                 sortedJobs.remove(chosenJob)
@@ -78,13 +81,13 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
 
     return person
 
-def genHousehold(house, jobs, leisureLocations, cityData, statusBar):
+def genHousehold(house, jobs, leisureLocations, cityData, statusBar, random):
     members = []
     numResidents = house.numResidents
     sortedJobs = sortLocations(house.location, jobs)
     sortedLeisureLocations = sortLocations(house.location, leisureLocations)
     for member in range(numResidents):
-        person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData["workFromHomeRatio"], cityData.get("workFromHomeTiming"))
+        person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData["workFromHomeRatio"], cityData.get("workFromHomeTiming"), random)
         if not person.job.isHiring():
             jobs.remove(person.job)
         members.append(person)
@@ -100,7 +103,7 @@ def pythagoreanTheorem(pointOne, pointTwo):
     dy = pointOne[1] - pointTwo[1]
     return (dx ** 2 + dy ** 2) ** 0.5
 
-def genHouseholds(locations, cityData):
+def genHouseholds(locations, cityData, random):
     homes, jobs, leisureLocations = bucketLocations(locations)
    
     totalPopulation = 0 
@@ -110,7 +113,7 @@ def genHouseholds(locations, cityData):
     people = []
     statusBar = StatusBar(totalPopulation)
     for house in homes:
-        people.extend(genHousehold(house, jobs, leisureLocations, cityData, statusBar))
+        people.extend(genHousehold(house, jobs, leisureLocations, cityData, statusBar, random))
 
     statusBar.complete()
     
@@ -138,6 +141,7 @@ if __name__ == "__main__":
     import json
     from createUniqueZones import genZones
     from createNodes import genAllNodes
+    import random
 
     with open('config.json', 'r') as f:
         info = json.load(f)
@@ -146,11 +150,11 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random.Random(3))
+    cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
     print("Generating Nodes...")
-    locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'))
+    locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
     
-    people = genHouseholds(locations, city)
+    people = genHouseholds(locations, city, random)
 
     totalPopulation = 0
     for person in people:

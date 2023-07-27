@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt 
 from createUniqueZones import genZones
 from createNodes import genAllNodes
-from createLinks import genAllLinks
-from createJobs import genJobs
 from createHouseholds import genHouseholds
+from createLinks import genAllLinks
 from convertData import writeFiles
 import json
 import os
 import random
+from datetime import datetime
 
 def main():
     os.system("rm -rf ./outputs/")
@@ -23,34 +23,48 @@ def main():
     AREA = XLENGTH * YLENGTH
 
     cityDimensions = (XLENGTH, YLENGTH)
-    
+ 
     zoneInfo = config['zones']
 
+    seeds = config.get("seeds")
+
     print("Generating zones...")
-    genZones(cityDimensions, zoneInfo, plt, random.Random(3))
+    zoneRandom = getRandom("zones", seeds)
+    cellLength = genZones(cityDimensions, zoneInfo, config.get('subZones'), plt, zoneRandom)
    
     print("Generating nodes in zones...")
-    genAllNodes(zoneInfo, plt)
-
-    print("Generating links between nodes...")
-    links = genAllLinks(1, zoneInfo, plt)
-
-    print("Generating jobs within city...")
-    jobs = genJobs(zoneInfo)
+    nodeRandom = getRandom("nodes", seeds)
+    locations = genAllNodes(zoneInfo, cellLength, plt, config.get('subZones'), nodeRandom)
 
     print("Generating households with agents...")
-    houseHolds = genHouseholds(zoneInfo, jobs, cityInfo['pctWorkFromHome']/100)
-    
-    if not houseHolds:
-     return False
+    agentsRandom = getRandom("agents", seeds)
+    people = genHouseholds(locations, cityInfo, agentsRandom)
+   
+    """
+    print("Generating links between nodes...")
+    linksRandom = getRandom("links", seeds)
+    links = genAllLinks(1, zoneInfo, plt)
 
     print("Converting data to MATSIM format")
     writeFiles(zoneInfo, houseHolds, links)
-    plt.legend(loc="upper left")
    
     print("Running MATSIM simulation and generating plot...")
     os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
+    """
+
+    plt.legend(loc="upper left")
     plt.show()
 
+def getRandom(mode, seeds):
+    currentSeed = datetime.now().timestamp()
+    
+    if seeds and seeds.get(mode):
+        currentSeed = seeds.get(mode)
+    
+    returnRandom = random.Random(currentSeed)
+    
+    print(f"The {mode} seed is currently set to {currentSeed}")
+
+    return returnRandom
 
 main()

@@ -27,9 +27,10 @@ class Person:
         return returnString + "\n"
 
 class Location:
-    def __init__(self, location, locationTypes, numResidents=None, maxWorkers=None):
+    def __init__(self, location, locationTypes, zone, numResidents=None, maxWorkers=None):
         self.location = location
         self.locationTypes = locationTypes
+        self.zone = zone
         self.numResidents = numResidents
         self.maxWorkers = maxWorkers
         self.timings = None

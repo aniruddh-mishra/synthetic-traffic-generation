@@ -42,13 +42,16 @@ def genZones(dimensions, zoneInfo, subZones, plt, random):
                 weights = [] 
                 for zone in zoneTypes:
                     remainingCells = getRemainingCells(zoneInfo[zone], totalCells)
-                    zoneInfo[zone]['maxNumCells'] = max(1, int(zoneInfo[zone]['maxZoneArea'] / cellArea))
+                    zoneInfo[zone]['maxNumCells'] = max(1, round(zoneInfo[zone]['maxZoneArea'] / cellArea))
                     weights.append(remainingCells / zoneInfo[zone]['maxNumCells'])
-                
-                zoneType = random.choices(zoneTypes, weights=weights)[0]
+           
+                if not len(weights):
+                    zoneType = random.choice(list(zoneInfo.keys()))
+                else:
+                    zoneType = random.choices(zoneTypes, weights=weights)[0]
                 numCells = zoneInfo[zoneType]['maxNumCells']
-                
-                if remainingCells < numCells:
+                remainingCells = getRemainingCells(zoneInfo[zoneType], totalCells)
+                if remainingCells <= numCells and len(weights):
                     numCells = remainingCells
                     zoneTypes.remove(zoneType)
 
@@ -62,7 +65,8 @@ def genZones(dimensions, zoneInfo, subZones, plt, random):
     return cellLength
 
 def getRemainingCells(zone, totalCells):
-    remainingCells = zone['landAreaRatio'] * totalCells
+    totalZoneCells = zone['landAreaRatio'] * totalCells
+    remainingCells = totalZoneCells - len(zone['land'])
     return round(remainingCells)
 
 def addCells(numCells, zones, startPoint, zoneType, random):
@@ -128,7 +132,7 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    genZones(dimensions, zoneInfo, info.get('subZones'), plt, random.Random(3))
+    genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
     plt.plot(0, 0)
     plt.legend()
     plt.show()
