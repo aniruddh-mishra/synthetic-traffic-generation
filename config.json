@@ -5,8 +5,8 @@
     "agents": 1690477925.336275
   },
   "city": {
-    "xLength": 1200,
-    "yLength": 1200,
+    "xLength": 1000,
+    "yLength": 1000,
     "workFromHomeRatio": 0.2,
     "homesWithCarsRatio": 0.2,
     "workFromHomeTiming": [9, 17]
@@ -35,7 +35,7 @@
       "maxBuildings": 50, 
       "color": "red",
       "buildingTypes": ["housing"],
-      "numResidents": [100, 200]
+      "numResidents": [1, 6]
     }, 
     "industrial": {
       "buildingArea": 24000, 

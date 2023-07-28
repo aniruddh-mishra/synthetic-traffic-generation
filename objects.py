@@ -30,6 +30,18 @@ class Person:
         self.convertScheduleToXML(plan, doc)
         
     def convertScheduleToXML(self, parentSection, doc):
+        for task in self.schedule:
+            if task["actionType"] == "home":
+                task["end_time"] = "08:00:00"
+            else:
+                task["end_time"] = "17:30:00"
+            self.makeAct(task, parentSection, doc, True)
+
+        self.makeAct({
+            "actionType": "home",
+            "location": self.house,
+        }, parentSection, doc, False)
+        """
         startOfDay = self.schedule[0]
         leaveHouse = startOfDay["times"][0]
         taskHouse = {
@@ -45,7 +57,7 @@ class Person:
 
         taskHouse["times"] = None
         self.makeAct(taskHouse, parentSection, doc)
-
+        """
     def makeAct(self, task, parentSection, doc, leg=False):
         actAttributes = {
             "type": task["actionType"],
@@ -57,7 +69,7 @@ class Person:
             endHour = int(endTime)
             endMinute = round((endTime % 1) * 60)
             endTimeString = f"{endHour:02}:{endMinute:02}:00"
-            actAttributes["end_time"] = endTimeString
+            actAttributes["end_time"] = task["end_time"]
         writeToXML('act', actAttributes, parentSection, doc)
         if leg:
             legAttributes = {

@@ -49,6 +49,7 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
     sortedLeisureLocations = sortedLeisureLocations.copy()
   
     while True:
+        break
         chooseLeisure = random.randint(1, 3) != 1
         if not chooseLeisure:
             break
