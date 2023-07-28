@@ -53,7 +53,11 @@ class Person:
             "y": task["location"].location[1],
         }
         if task.get("times"):
-            actAttributes["end_time"] = task["times"][1]
+            endTime = task["times"][1]
+            endHour = int(endTime)
+            endMinute = round((endTime % 1) * 60)
+            endTimeString = f"{endHour:02}:{endMinute:02}:00"
+            actAttributes["end_time"] = endTimeString
         writeToXML('act', actAttributes, parentSection, doc)
         if leg:
             legAttributes = {
