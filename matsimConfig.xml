@@ -24,6 +24,10 @@
 		<parameterset type="activityParams" >
 			<param name="activityType"            value="work" /> <!-- work -->
 			<param name="typicalDuration" value="08:00:00" />
+    </parameterset>
+    <parameterset type="activityParams" >
+			<param name="activityType"            value="leisure" /> <!-- work -->
+			<param name="typicalDuration" value="08:00:00" />
 		</parameterset>
 	</module>
 	

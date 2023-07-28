@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import matplotlib.pyplot as plt 
 from createZones import genZones
 from createNodes import genAllNodes
@@ -42,17 +44,15 @@ def main():
    
     print("Generating links between nodes...")
     linksRandom = getRandom("links", seeds)
-    links = genAllLinks(config.get('links'), regions, districts, plt, linksRandom)
+    links = genAllLinks(config.get('links'), regions, districts, locations, plt, linksRandom)
 
     del regions, districts
     
-    """
     print("Converting data to MATSIM format")
-    writeFiles(zoneInfo, houseHolds, links)
-   
+    writeFiles(locations, people, links)
+
     print("Running MATSIM simulation and generating plot...")
     os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
-    """
 
     plt.legend(loc="upper left")
     plt.show()

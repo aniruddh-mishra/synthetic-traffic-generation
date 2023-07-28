@@ -1,36 +1,53 @@
 import random
 from status import StatusBar
+from objects import Link
 
-def genAllLinks(linkConfigs, regions, districts, plt, random):
+def genAllLinks(linkConfigs, regions, districts, locations, plt, random):
     if not linkConfigs:
         linkConfigs = {}
 
     numCentralHubs = linkConfigs.get("numCentralHubs")
     allCentralHubs = []
-    allRoads = []
+    districtRoads = []
     statusBar = StatusBar(len(districts) +  1)
     for district in districts:
         districtNodes = [] 
         for region in district:
             districtNodes.extend(regions[region])
-        districtRoads, centralHubs = genIntraDistrictLinks(numCentralHubs, districtNodes, plt, random)
-        allRoads.extend(districtRoads)
+        intraDistrictRoads, centralHubs = genIntraDistrictLinks(numCentralHubs, districtNodes, plt, random)
+        districtRoads.extend(intraDistrictRoads)
         allCentralHubs.extend(centralHubs)
         statusBar.updateProgress()
 
     highways = findMinimumSpanningTree(allCentralHubs)
     for highway in highways:
-        if highway in allRoads or [highway[1], highway[0]] in allRoads:
+        if highway in districtRoads or [highway[1], highway[0]] in districtRoads:
             highways.remove(highway)
     statusBar.updateProgress()
     statusBar.complete()
 
     plotRoads(highways, "white", plt)
 
-    # TODO make road object with lanes, free speed and return list
+    allRoads = []
+    for road in districtRoads:
+        numLanes = 2
+        speedLimit = 10
+        modes = "car"
+        capacity = 100
+        nodes = [locations.index(road[0]), locations.index(road[1])]
+        roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road)
+        allRoads.append(roadObject)
 
-def genInterRegionLinks(centralHubs):
-    pass
+    for road in highways:
+        numLanes = 4
+        speedLimit = 60
+        modes = "car"
+        capacity = 1000
+        nodes = [locations.index(road[0]), locations.index(road[1])]
+        roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road)
+        allRoads.append(roadObject)
+
+    return allRoads
 
 def genIntraDistrictLinks(numCentralHubs, districtNodes, plt, random):
     if len(districtNodes) == 1:
@@ -127,8 +144,9 @@ if __name__ == "__main__":
     cellLength, districts = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
     print("Generating Nodes...")
     locations, regions = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
-    
-    genAllLinks(info.get('links'), regions, districts, plt, random)
+   
+    print("Generating Links...")
+    genAllLinks(info.get('links'), regions, districts, locations, plt, random)
 
     plt.plot(0, 0)
     plt.legend(loc="upper left")
