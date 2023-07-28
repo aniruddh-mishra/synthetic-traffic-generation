@@ -142,7 +142,7 @@ def bucketLocations(locations):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import json
-    from createUniqueZones import genZones
+    from createZones import genZones
     from createNodes import genAllNodes
     import random
 
@@ -156,7 +156,8 @@ if __name__ == "__main__":
     cellLength, _ = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
     print("Generating Nodes...")
     locations, regions = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
-    
+
+    print("Generating Households")
     people = genHouseholds(locations, city, random)
 
     totalPopulation = 0

@@ -124,7 +124,7 @@ def neighborHasTop(region, regions, topZone, currentLocations):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import json
-    from createUniqueZones import genZones
+    from createZones import genZones
     import random
 
     with open('config.json', 'r') as f:

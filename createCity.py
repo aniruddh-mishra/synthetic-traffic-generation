@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt 
-from createUniqueZones import genZones
+from createZones import genZones
 from createNodes import genAllNodes
 from createHouseholds import genHouseholds
 from createLinks import genAllLinks

@@ -112,7 +112,7 @@ def pythagoreanTheorem(coordinateOne, coordinateTwo):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import json
-    from createUniqueZones import genZones
+    from createZones import genZones
     from createNodes import genAllNodes
     from createHouseholds import genHouseholds
     import random
