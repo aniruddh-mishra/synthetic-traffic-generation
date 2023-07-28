@@ -4,7 +4,7 @@
 
   <module name="global">
     <param name="randomSeed" value="4711" />
-    <param name="coordinateSystem" value="Atlantis" />
+    <param name="coordinateSystem" value="EPSG:3857" />
   </module>
 
   <module name="network">
@@ -18,7 +18,7 @@
   <module name="controler">
     <param name="outputDirectory" value="./outputs" />
     <param name="firstIteration" value="0" />
-    <param name="lastIteration" value="1" />
+    <param name="lastIteration" value="0" />
   </module>
 
   <module name="qsim">
@@ -43,6 +43,10 @@
     </parameterset>
     <parameterset type="activityParams" >
       <param name="activityType"    value="work" /> <!-- work -->
+      <param name="typicalDuration" value="08:00:00" />
+    </parameterset>
+    <parameterset type="activityParams" >
+      <param name="activityType"    value="leisure" /> <!-- work -->
       <param name="typicalDuration" value="08:00:00" />
     </parameterset>
   </module>
