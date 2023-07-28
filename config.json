@@ -5,14 +5,14 @@
     "agents": 1690477925.336275
   },
   "city": {
-    "xLength": 1000,
-    "yLength": 1000,
+    "xLength": 5000,
+    "yLength": 5000,
     "workFromHomeRatio": 0.2,
     "homesWithCarsRatio": 0.2,
     "workFromHomeTiming": [9, 17]
   },
   "links": {
-    "numCentralHubs": [3, 5]
+    "numCentralHubs": [4, 6]
   },
   "subZones": {
     "apartment": {
@@ -38,7 +38,7 @@
       "numResidents": [1, 6]
     }, 
     "industrial": {
-      "buildingArea": 12000, 
+      "buildingArea": 24000, 
       "landAreaRatio": 0.1, 
       "maxBuildings": 10, 
       "color": "orange",

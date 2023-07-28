@@ -30,11 +30,11 @@ def main():
 
     print("Generating zones...")
     zoneRandom = getRandom("zones", seeds)
-    cellLength = genZones(cityDimensions, zoneInfo, config.get('subZones'), plt, zoneRandom)
+    cellLength, districts = genZones(cityDimensions, zoneInfo, config.get('subZones'), plt, zoneRandom)
    
     print("Generating nodes in zones...")
     nodeRandom = getRandom("nodes", seeds)
-    locations = genAllNodes(zoneInfo, cellLength, plt, config.get('subZones'), nodeRandom)
+    locations, regions = genAllNodes(zoneInfo, cellLength, plt, config.get('subZones'), nodeRandom)
 
     print("Generating households with agents...")
     agentsRandom = getRandom("agents", seeds)
@@ -42,7 +42,9 @@ def main():
    
     print("Generating links between nodes...")
     linksRandom = getRandom("links", seeds)
-    links = genAllLinks(1, zoneInfo, plt, linksRandom)
+    links = genAllLinks(config.get('links'), regions, districts, plt, linksRandom)
+
+    del regions, districts
     
     """
     print("Converting data to MATSIM format")

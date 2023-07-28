@@ -17,9 +17,7 @@ def genAllNodes(zones, cellLength, plt, subZoneInfo, random):
 
     statusBar.complete()
 
-    del regions
-
-    return locations
+    return locations, regions
 
 def nodeToLocations(node, info, random, zoneType, region):
     numResidents = None
@@ -136,9 +134,9 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
+    cellLength, _ = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
     print("Generating Nodes...")
-    locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
+    locations, regions = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
     for location in locations:
         print(location)
     plt.plot(0, 0)

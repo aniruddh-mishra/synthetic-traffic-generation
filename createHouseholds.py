@@ -153,9 +153,9 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    cellLength = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
+    cellLength, _ = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
     print("Generating Nodes...")
-    locations = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
+    locations, regions = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
     
     people = genHouseholds(locations, city, random)
 

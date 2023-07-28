@@ -35,6 +35,7 @@ def genZones(dimensions, zoneInfo, subZones, plt, random):
             zoneRow.append(None)
         zones.append(zoneRow)
 
+    districts = []
     statusBar = StatusBar(len(zones))
     for rowIndex, row in enumerate(zones):
         for cellIndex, cell in enumerate(row):
@@ -57,12 +58,13 @@ def genZones(dimensions, zoneInfo, subZones, plt, random):
 
                 cells = addCells(numCells, zones, (cellIndex, rowIndex), zoneType, random)
                 zoneInfo[zoneType]['land'].extend(cells)
+                districts.append(cells)
         statusBar.updateProgress()
 
     statusBar.complete()
 
     plotZones(cellLength, zones, plt, zoneInfo)
-    return cellLength
+    return cellLength, districts
 
 def getRemainingCells(zone, totalCells):
     totalZoneCells = zone['landAreaRatio'] * totalCells
