@@ -52,7 +52,7 @@ def main():
     writeFiles(locations, people, links)
 
     print("Running MATSIM simulation and generating plot...")
-    os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&")
+    os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&&gunzip outputs/*.gz outputs/ITERS/*/*.gz&")
 
     plt.legend(loc="upper left")
     plt.show()

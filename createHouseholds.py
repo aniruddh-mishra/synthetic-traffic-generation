@@ -34,9 +34,9 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
             deltaStart = abs(random.gauss(0, variation))
             deltaEnd = abs(random.gauss(0, variation))
             startTime = timingsGuidelines[0] + deltaStart
-            startTime = min(max(startTime, timingsGuidelines[0] - variation), timingsGuidelines[0] + variation)
+            startTime = min(max(startTime, timingsGuidelines[0]), timingsGuidelines[0] + variation)
             endTime = timingsGuidelines[1] + deltaEnd
-            endTime = min(max(endTime, timingsGuidelines[1] - variation), timingsGuidelines[1] + variation)
+            endTime = min(max(endTime, timingsGuidelines[1] - variation), timingsGuidelines[1])
             timings = [startTime, endTime]
             if startTime > endTime:
                 timings = timingsGuidelines
@@ -49,7 +49,6 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
     sortedLeisureLocations = sortedLeisureLocations.copy()
   
     while True:
-        break
         chooseLeisure = random.randint(1, 3) != 1
         if not chooseLeisure:
             break
@@ -115,6 +114,7 @@ def genHouseholds(locations, cityData, random):
         totalPopulation += house.numResidents
 
     people = []
+    print(f"Total Population: {totalPopulation}")
     statusBar = StatusBar(totalPopulation)
     for house in homes:
         people.extend(genHousehold(house, jobs, leisureLocations, cityData, statusBar, random))

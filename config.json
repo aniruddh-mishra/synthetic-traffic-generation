@@ -7,7 +7,7 @@
   "city": {
     "xLength": 1000,
     "yLength": 1000,
-    "workFromHomeRatio": 0.2,
+    "workFromHomeRatio": 0,
     "homesWithCarsRatio": 0.2,
     "workFromHomeTiming": [9, 17]
   },
@@ -15,92 +15,91 @@
     "numCentralHubs": [4, 6]
   },
   "subZones": {
-    "apartment": {
-      "color": "blue",
-      "buildingArea": 6000, 
-      "buildingTypes": ["housing", "work"],
-      "maxWorkers": [9, 10],
-      "numResidents": [100, 200],
-      "timings": {
-        "work": {
-          "time": [8, 19]
-        }
-      }
-    }
-  },
-  "zones": {
-    "residential": {
-      "buildingArea": 7000, 
-      "landAreaRatio": 0.7, 
-      "maxBuildings": 50, 
-      "color": "red",
-      "buildingTypes": ["housing"],
-      "numResidents": [1, 6]
-    }, 
-    "industrial": {
-      "buildingArea": 24000, 
-      "landAreaRatio": 0.1, 
-      "maxBuildings": 10, 
-      "color": "orange",
-      "buildingTypes": ["work"],
-      "subZones": ["apartment"],
-      "maxWorkers": [90, 100],
-      "timings": {
-        "work": {
-          "time": [8, 16],
-          "peopleVariation": 1 
-        }
-      }
-    }, 
-    "commercial": {
-      "buildingArea": 10000, 
-      "landAreaRatio": 0.1, 
-      "maxBuildings": 100, 
-      "color": "green",
-      "buildingTypes": ["leisure", "work"],
-      "maxWorkers": [80, 100],
-      "timings": {
-        "leisure": {
-          "time": [8, 22],
-          "normalTimeDistribution": 1,
-          "averageDuration": 4
-        },
-        "work": {
-          "time": [7, 22],
-          "normalTimeDistribution": 1.5
-        }
-      }
-    }, 
-    "offices": {
-      "buildingArea": 5000,
-      "landAreaRatio": 0.05,
-      "maxBuildings": 2,
-      "color": "brown",
-      "buildingTypes": ["work", "leisure"],
-      "maxWorkers": [70, 100],
-      "subZones": ["apartment"],
-      "timings": {
-        "work": {
-          "time": [8, 16],
-          "normalTimeDistribution": 1
-        },
-        "leisure": {
-          "time": [16, 24],
-          "averageDuration": 1,
-          "normalTimeDistribution": 2
-        }
-      }
-    },
     "schools": {
       "buildingArea": 5000,
-      "landAreaRatio": 0.05,
-      "maxBuildings": 1,
       "color": "purple",
       "buildingTypes": ["work"],
       "maxWorkers": [80, 100],
       "timings": {
         "work": {
           "time": [8,16]
+        }
+      }
+    }
+  },
+  "zones": {
+    "residential": {
+      "buildingArea": 800, 
+      "landAreaRatio": 0.3, 
+      "maxBuildings": 50, 
+      "color": "red",
+      "subZones": ["schools"],
+      "buildingTypes": ["housing"],
+      "numResidents": [1, 6]
+    },
+    "apartment": {
+      "color": "blue",
+      "buildingArea": 1000,
+      "landAreaRatio": 0.1,
+      "maxBuildings": 3,
+      "buildingTypes": ["housing", "work"],
+      "maxWorkers": [10, 30],
+      "numResidents": [100, 200],
+      "timings": {
+        "work": {
+          "time": [8, 16],
+          "peopleVariation": 5
+        }
+      }
+    },
+    "industrial": {
+      "buildingArea": 1500, 
+      "landAreaRatio": 0.1, 
+      "maxBuildings": 10, 
+      "color": "orange",
+      "buildingTypes": ["work"],
+      "maxWorkers": [20, 50],
+      "timings": {
+        "work": {
+          "time": [7, 14],
+          "peopleVariation": 3 
+        }
+      }
+    }, 
+    "commercial": {
+      "buildingArea": 1500, 
+      "landAreaRatio": 0.3, 
+      "maxBuildings": 100, 
+      "color": "green",
+      "buildingTypes": ["leisure", "work"],
+      "maxWorkers": [30, 60],
+      "timings": {
+        "leisure": {
+          "time": [8, 22],
+          "normalTimeDistribution": 1,
+          "averageDuration": 3,
+          "peopleVariation": 2
+        },
+        "work": {
+          "time": [6, 24],
+          "normalTimeDistribution": 1,
+          "peopleVariation": 3 
+        }
+      }
+    }, 
+    "offices": {
+      "buildingArea": 1000,
+      "landAreaRatio": 0.3,
+      "maxBuildings": 2,
+      "color": "brown",
+      "buildingTypes": ["work"],
+      "maxWorkers": [50, 100],
+      "subZones": ["schools"],
+      "timings": {
+        "work": {
+          "time": [8, 16],
+          "normalTimeDistribution": 1,
+          "peopleVariation": 2
         }
       }
     }

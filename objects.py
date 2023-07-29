@@ -16,6 +16,8 @@ class Person:
             "times": times,
             "legMode": transport
         }
+        if actionType == "work" and location.location == self.house.location:
+            self.workFromHome = True
         self.schedule.append(task)
 
     def convertToXML(self, id, parentSection, doc):
@@ -30,18 +32,6 @@ class Person:
         self.convertScheduleToXML(plan, doc)
         
     def convertScheduleToXML(self, parentSection, doc):
-        for task in self.schedule:
-            if task["actionType"] == "home":
-                task["end_time"] = "08:00:00"
-            else:
-                task["end_time"] = "17:30:00"
-            self.makeAct(task, parentSection, doc, True)
-
-        self.makeAct({
-            "actionType": "home",
-            "location": self.house,
-        }, parentSection, doc, False)
-        """
         startOfDay = self.schedule[0]
         leaveHouse = startOfDay["times"][0]
         taskHouse = {
@@ -49,15 +39,18 @@ class Person:
             "location": self.house,
             "legMode": "car",
             "times": [None, leaveHouse]
-        }   
-        self.makeAct(taskHouse, parentSection, doc, True)
+        }
+
+        self.makeAct(taskHouse, parentSection, doc, not self.workFromHome)
     
         for task in self.schedule:
+            if task["actionType"] == "work" and self.workFromHome:
+                continue
             self.makeAct(task, parentSection, doc, True)
 
         taskHouse["times"] = None
         self.makeAct(taskHouse, parentSection, doc)
-        """
+
     def makeAct(self, task, parentSection, doc, leg=False):
         actAttributes = {
             "type": task["actionType"],
@@ -69,7 +62,7 @@ class Person:
             endHour = int(endTime)
             endMinute = round((endTime % 1) * 60)
             endTimeString = f"{endHour:02}:{endMinute:02}:00"
-            actAttributes["end_time"] = task["end_time"]
+            actAttributes["end_time"] = endTime * 3600
         writeToXML('act', actAttributes, parentSection, doc)
         if leg:
             legAttributes = {
@@ -132,7 +125,8 @@ class Link:
             "length": self.calcDistance(),
             "capacity": self.capacity,
             "permlanes": self.numLanes,
-            "freespeed": self.speedLimit
+            "freespeed": self.speedLimit,
+            "modes": self.modes
         }
         writeToXML('link', attributes, parentSection, doc)
         attributes["id"] += 1

@@ -30,19 +30,19 @@ def genAllLinks(linkConfigs, regions, districts, locations, plt, random):
 
     allRoads = []
     for road in districtRoads:
-        numLanes = 1
-        speedLimit = 60
+        numLanes = 2
+        speedLimit = 10
         modes = "car"
-        capacity = 100
+        capacity = 3600
         nodes = [locations.index(road[0]), locations.index(road[1])]
         roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road)
         allRoads.append(roadObject)
 
     for road in highways:
-        numLanes = 1
-        speedLimit = 60
+        numLanes = 10
+        speedLimit = 27
         modes = "car"
-        capacity = 1000
+        capacity = 36000
         nodes = [locations.index(road[0]), locations.index(road[1])]
         roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road)
         allRoads.append(roadObject)
