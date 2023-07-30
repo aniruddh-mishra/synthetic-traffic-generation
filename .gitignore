@@ -9,6 +9,7 @@ __pycache__/
 # Setup for Simulation
 setup/*
 output/*
+tests/*
 outputs/*
 matsim.jar
 

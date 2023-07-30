@@ -3,6 +3,7 @@ class Person:
         self.house = house
         self.job = job
         self.schedule = []
+        self.currentVehicle = None
         self.workFromHome = False
 
     def getNextAvailable(self):
@@ -16,6 +17,7 @@ class Person:
             "times": times,
             "legMode": transport
         }
+        self.currentVehicle = transport
         if actionType == "work" and location.location == self.house.location:
             self.workFromHome = True
         self.schedule.append(task)
@@ -37,15 +39,13 @@ class Person:
         taskHouse = {
             "actionType": "home",
             "location": self.house,
-            "legMode": "car",
+            "legMode": self.schedule[0]["legMode"],
             "times": [None, leaveHouse]
         }
 
         self.makeAct(taskHouse, parentSection, doc, not self.workFromHome)
     
         for task in self.schedule:
-            if task["actionType"] == "work" and self.workFromHome:
-                continue
             self.makeAct(task, parentSection, doc, True)
 
         taskHouse["times"] = None
@@ -88,7 +88,30 @@ class Location:
         self.numResidents = numResidents
         self.maxWorkers = maxWorkers
         self.timings = None
+        self.transport = []
         self.workers = []
+
+    def hasCar(self, timings):
+        for car in self.transport:
+            if self.isCarAvailable(car["times"], timings):
+                return True
+
+    def checkoutCar(self, timings):
+        for car in self.transport:
+            index = 0
+            for time in car["times"]:
+                if time[0] < timings[0] and time[1] < timings[1]:
+                    car["times"].insert(index + 1, timings)
+                    return
+                index += 1
+            if not len(car["times"]):
+                car["times"].append(timings)
+
+    def isCarAvailable(self, car, timings):
+        for time in car:
+            if (time[0] >= timings[0] and time[1] <= timings[1]) or (time[1] >= timings[1] and time[0] <= timings[0]):
+                return False
+        return True
 
     def addWorker(self, agent):
         self.workers.append(agent)
@@ -108,21 +131,20 @@ class Location:
         return f"This node is located at {self.location} and is of the type(s) {', '.join(self.locationTypes)}. It has {self.numResidents} residents and the maximum number of workers here is {self.maxWorkers}. The timings for this location are set to {self.timings}"
 
 class Link:
-    def __init__(self, numLanes, speedLimit, modes, capacity, nodes, locations, addedDistanceRatio=0):
+    def __init__(self, numLanes, speedLimit, modes, capacity, nodes, locations):
         self.numLanes = numLanes
         self.speedLimit = speedLimit
         self.modes = modes
         self.capacity = capacity
         self.nodes = nodes
         self.locations = locations
-        self.addedDistanceRatio = addedDistanceRatio
 
-    def convertToXML(self, id, parentSection, doc):
+    def convertToXML(self, id, parentSection, doc, random):
         attributes = {
             "id": id,
             "from": self.nodes[0] + 1,
             "to": self.nodes[1] + 1,
-            "length": self.calcDistance(),
+            "length": self.calcDistance(random),
             "capacity": self.capacity,
             "permlanes": self.numLanes,
             "freespeed": self.speedLimit,
@@ -134,13 +156,13 @@ class Link:
         attributes["to"] = self.nodes[0] + 1
         writeToXML('link', attributes, parentSection, doc)
 
-    def calcDistance(self):
+    def calcDistance(self, random):
         nodeOne = self.locations[0].location
         nodeTwo = self.locations[1].location
         deltaX = nodeOne[0] - nodeTwo[0]
         deltaY = nodeOne[1] - nodeTwo[1]
         exactDistance = ((deltaX ** 2) + (deltaY ** 2)) ** 0.5
-        addedDistance = self.addedDistanceRatio * exactDistance
+        addedDistance = random.uniform(0, 0.5) * exactDistance
         return exactDistance + addedDistance
 
 def writeToXML(objectName, attributes, parentSection, doc):

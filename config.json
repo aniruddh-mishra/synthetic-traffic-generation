@@ -5,45 +5,23 @@
     "agents": 1690477925.336275
   },
   "city": {
-    "xLength": 1000,
-    "yLength": 1000,
-    "workFromHomeRatio": 0,
-    "homesWithCarsRatio": 0.2,
+    "xLength": 3000,
+    "yLength": 3000,
+    "workFromHomeRatio": 0.2,
+    "workFromZoneRatio": 0,
+    "homesWithCarsRatio": 1,
+    "numCarsInHome": [1, 2],
     "workFromHomeTiming": [9, 17]
   },
   "links": {
     "numCentralHubs": [4, 6]
   },
   "subZones": {
-    "schools": {
-      "buildingArea": 5000,
-      "color": "purple",
-      "buildingTypes": ["work"],
-      "maxWorkers": [80, 100],
-      "timings": {
-        "work": {
-          "time": [8,16]
-        }
-      }
-    }
-  },
-  "zones": {
-    "residential": {
-      "buildingArea": 800, 
-      "landAreaRatio": 0.3, 
-      "maxBuildings": 50, 
-      "color": "red",
-      "subZones": ["schools"],
-      "buildingTypes": ["housing"],
-      "numResidents": [1, 6]
-    },
     "apartment": {
       "color": "blue",
       "buildingArea": 1000,
-      "landAreaRatio": 0.1,
-      "maxBuildings": 3,
       "buildingTypes": ["housing", "work"],
-      "maxWorkers": [10, 30],
+      "maxWorkers": [50, 100],
       "numResidents": [100, 200],
       "timings": {
         "work": {
@@ -52,13 +30,35 @@
         }
       }
     },
+    "schools": {
+      "buildingArea": 5000,
+      "color": "purple",
+      "buildingTypes": ["work"],
+      "maxWorkers": [100, 1000],
+      "timings": {
+        "work": {
+          "time": [8, 16]
+        }
+      }
+    }
+  },
+  "zones": {
+    "residential": {
+      "buildingArea": 800, 
+      "landAreaRatio": 0.5, 
+      "maxBuildings": 50, 
+      "color": "red",
+      "subZones": ["schools", "apartment"],
+      "buildingTypes": ["housing"],
+      "numResidents": [10, 16]
+    },
     "industrial": {
       "buildingArea": 1500, 
       "landAreaRatio": 0.1, 
       "maxBuildings": 10, 
       "color": "orange",
       "buildingTypes": ["work"],
-      "maxWorkers": [20, 50],
+      "maxWorkers": [100, 1000],
       "timings": {
         "work": {
           "time": [7, 14],
@@ -69,10 +69,11 @@
     "commercial": {
       "buildingArea": 1500, 
       "landAreaRatio": 0.3, 
-      "maxBuildings": 100, 
+      "maxBuildings": 100,
+      "subZones": ["apartment"],
       "color": "green",
       "buildingTypes": ["leisure", "work"],
-      "maxWorkers": [30, 60],
+      "maxWorkers": [100, 200],
       "timings": {
         "leisure": {
           "time": [8, 22],
@@ -93,7 +94,7 @@
       "maxBuildings": 2,
       "color": "brown",
       "buildingTypes": ["work"],
-      "maxWorkers": [50, 100],
+      "maxWorkers": [100, 200],
       "subZones": ["schools"],
       "timings": {
         "work": {

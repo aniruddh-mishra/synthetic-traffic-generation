@@ -1,8 +1,10 @@
 from status import StatusBar
 from objects import Person
 
-def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio, workFromHomeTiming, random):
-    workFromHome = random.random() < workFromHomeRatio
+def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData, random):
+    randomSelector = random.random()
+    workFromHome = randomSelector < cityData["workFromHomeRatio"]
+    workFromZone = not workFromHome and randomSelector < cityData["workFromZoneRatio"]
     if workFromHome:
         chosenJob = house 
     else:
@@ -13,7 +15,7 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
                 print("Ran out of jobs, adding extra work from home person.")
                 break
             chosenJob = random.choices(sortedJobs, weights=[len(sortedJobs) - i for i, _ in enumerate(sortedJobs)])[0]
-            if not chosenJob.isHiring():
+            if not chosenJob.isHiring() or (not workFromZone and chosenJob.zone == house.zone):
                 sortedJobs.remove(chosenJob)
                 jobs.remove(chosenJob)
             else:
@@ -24,7 +26,7 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
     person.workFromHome = workFromHome
 
     if workFromHome:
-        timings = workFromHomeTiming
+        timings = cityData.get("workFromHomeTiming")
     else: 
         timingsGuidelines = person.job.timings["work"]["time"]
         timings = timingsGuidelines
@@ -41,8 +43,11 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
             if startTime > endTime:
                 timings = timingsGuidelines
 
-    # TODO transport
-    transport = "car"
+    transport = "pt" # TODO add walking?
+    if house.hasCar(timings):
+        transport = "car"
+        house.checkoutCar(timings)
+    person.currentVehicle = transport
 
     person.addToSchedule("work", person.job, timings, transport)
 
@@ -77,19 +82,36 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, workFromHomeRatio
                 if activityTimings[1] <= activityTimings[0]:
                     return person
                 break
-        
+       
+        if transport != "car" and house.hasCar(activityTimings):
+            transport = "car"
+            person.addToSchedule("home", house, [activityTimings[0], activityTimings[0]], transport)
+
+        if transport == "car":
+            house.checkoutCar(activityTimings)
         person.addToSchedule("leisure", chosenActivity, activityTimings, transport)
         sortedLeisureLocations.remove(chosenActivity)
 
     return person
 
 def genHousehold(house, jobs, leisureLocations, cityData, statusBar, random):
+    homesWithCarsRatio = cityData["homesWithCarsRatio"]
+    hasCar = random.random() < homesWithCarsRatio
+    if hasCar:
+        transport = []
+        numCars = random.randint(*cityData["numCarsInHome"])
+        for car in range(numCars):
+            transport.append({
+                "times": []
+            })
+        house.transport = transport
+
     members = []
     numResidents = house.numResidents
-    sortedJobs = sortLocations(house.location, jobs)
-    sortedLeisureLocations = sortLocations(house.location, leisureLocations)
+    sortedJobs = sortLocations(house.location, jobs, sortJobsFunction)
+    sortedLeisureLocations = sortLocations(house.location, leisureLocations, sortLeisureFunction)
     for member in range(numResidents):
-        person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData["workFromHomeRatio"], cityData.get("workFromHomeTiming"), random)
+        person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData, random)
         if not person.job.isHiring() and not person.workFromHome:
             jobs.remove(person.job)
             sortedJobs.remove(person.job)
@@ -97,9 +119,18 @@ def genHousehold(house, jobs, leisureLocations, cityData, statusBar, random):
         statusBar.updateProgress()
     return members
 
-def sortLocations(reference, listLocations):
-    sortFunction = lambda location: pythagoreanTheorem(reference, location.location)
+def sortLocations(reference, listLocations, function):
+    sortFunction = lambda location: function(reference, location)
     return sorted(listLocations, key=sortFunction)
+
+def sortLeisureFunction(reference, location):
+    return pythagoreanTheorem(reference, location.location)
+
+def sortJobsFunction(reference, location):
+    score = pythagoreanTheorem(reference, location.location)
+    if location.maxWorkers:
+        return score / location.maxWorkers
+    return score
 
 def pythagoreanTheorem(pointOne, pointTwo):
     dx = pointOne[0] - pointTwo[0]

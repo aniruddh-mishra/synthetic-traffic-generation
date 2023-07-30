@@ -98,7 +98,10 @@ def genCellNodes(region, cellLength, zoneInfo, plt, subZoneInfo, random, regions
                 break
     
         cellNodes.append(coordinate)
-        locations.append(nodeToLocations(coordinate, buildingInfo, random, zoneType, region))
+        
+        if buildingType == "top":
+            buildingType = zoneType
+        locations.append(nodeToLocations(coordinate, buildingInfo, random, buildingType, region))
         plt.plot(*coordinate, marker="*", markersize=1, color=color)
    
     return locations

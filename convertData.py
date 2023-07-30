@@ -1,9 +1,8 @@
 from xml.dom import minidom
-import random
 from status import StatusBar
 
-def writeFiles(locations, people, links):
-    createNetwork(locations, links)
+def writeFiles(locations, people, links, random):
+    createNetwork(locations, links, random)
     createPopulation(people)
 
 def createPopulation(people):
@@ -22,7 +21,7 @@ def createPopulation(people):
 
     writeFile(populationDoc, "plans.xml")
 
-def createNetwork(locations, links):
+def createNetwork(locations, links, random):
     networkName = "synthetic city network"
     networkDoc = minidom.parseString(f'<?xml version="1.0" encoding="utf-8"?><!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd"><network name="{networkName}"></network>')
 
@@ -48,7 +47,7 @@ def createNetwork(locations, links):
     print("Writing Links...")
     statusBar = StatusBar(len(links))
     for link in links:
-        link.convertToXML(linkId, linksSection, networkDoc)
+        link.convertToXML(linkId, linksSection, networkDoc, random)
         linkId += 2
         statusBar.updateProgress()
 
