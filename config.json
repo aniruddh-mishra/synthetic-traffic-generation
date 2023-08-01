@@ -1,12 +1,12 @@
 {
   "seeds": {
-    "zones": 1690477603.636273,
-    "nodes": 1690477813.254151,
-    "agents": 1690477925.336275
+    "zones": 1,
+    "nodes": 1,
+    "agents": 1
   },
   "city": {
-    "xLength": 3000,
-    "yLength": 3000,
+    "xLength": 1000,
+    "yLength": 1000,
     "workFromHomeRatio": 0.2,
     "workFromZoneRatio": 0,
     "homesWithCarsRatio": 1,
@@ -14,7 +14,20 @@
     "workFromHomeTiming": [9, 17]
   },
   "links": {
-    "numCentralHubs": [4, 6]
+    "numCentralHubs": [4, 6],
+    "meshingRatio": 0.1,
+    "highways": {
+      "numLanes": [1, 3],
+      "speedLimit": [30, 60],
+      "capacity": [30000, 50000]
+    },
+    "districtRoads": {
+      "numLanes": [1, 3],
+      "speedLimit": [10, 30],
+      "capacity": [3000, 5000]
+    },
+    "roadsPublicTransportRatio": 0.2,
+    "publicTransportSeperate": false
   },
   "subZones": {
     "apartment": {
@@ -68,7 +81,7 @@
     }, 
     "commercial": {
       "buildingArea": 1500, 
-      "landAreaRatio": 0.3, 
+      "landAreaRatio": 0.2, 
       "maxBuildings": 100,
       "subZones": ["apartment"],
       "color": "green",
@@ -90,7 +103,7 @@
     }, 
     "offices": {
       "buildingArea": 1000,
-      "landAreaRatio": 0.3,
+      "landAreaRatio": 0.2,
       "maxBuildings": 2,
       "color": "brown",
       "buildingTypes": ["work"],

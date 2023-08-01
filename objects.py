@@ -131,20 +131,21 @@ class Location:
         return f"This node is located at {self.location} and is of the type(s) {', '.join(self.locationTypes)}. It has {self.numResidents} residents and the maximum number of workers here is {self.maxWorkers}. The timings for this location are set to {self.timings}"
 
 class Link:
-    def __init__(self, numLanes, speedLimit, modes, capacity, nodes, locations):
+    def __init__(self, numLanes, speedLimit, modes, capacity, nodes, locations, random):
         self.numLanes = numLanes
         self.speedLimit = speedLimit
         self.modes = modes
         self.capacity = capacity
         self.nodes = nodes
         self.locations = locations
+        self.length = self.calcDistance(random)
 
-    def convertToXML(self, id, parentSection, doc, random):
+    def convertToXML(self, id, parentSection, doc):
         attributes = {
             "id": id,
             "from": self.nodes[0] + 1,
             "to": self.nodes[1] + 1,
-            "length": self.calcDistance(random),
+            "length": self.length,
             "capacity": self.capacity,
             "permlanes": self.numLanes,
             "freespeed": self.speedLimit,

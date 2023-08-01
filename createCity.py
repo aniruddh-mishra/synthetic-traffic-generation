@@ -49,9 +49,8 @@ def main():
     del regions, districts
     
     print("Converting data to MATSIM format")
-    writeFiles(locations, people, links, random)
+    writeFiles(locations, people, links)
 
-    del locations, people, links, random
     print("Running MATSIM simulation and generating plot...")
     os.system("java -cp matsim.jar org.matsim.run.RunMatsim matsimConfig.xml&&gunzip outputs/*.gz outputs/ITERS/*/*.gz&")
 

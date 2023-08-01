@@ -43,7 +43,7 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData, random)
             if startTime > endTime:
                 timings = timingsGuidelines
 
-    transport = "pt" # TODO add walking?
+    transport = "transit_walk" # TODO add walking?
     if house.hasCar(timings):
         transport = "car"
         house.checkoutCar(timings)
@@ -185,12 +185,12 @@ if __name__ == "__main__":
     city = info['city']
     dimensions = city['xLength'], city['yLength']
 
-    cellLength, _ = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random)
+    cellLength, _ = genZones(dimensions, zoneInfo, info.get('subZones'), plt, random.Random(1))
     print("Generating Nodes...")
-    locations, regions = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random)
+    locations, regions = genAllNodes(zoneInfo, cellLength, plt, info.get('subZones'), random.Random(1))
 
     print("Generating Households")
-    people = genHouseholds(locations, city, random)
+    people = genHouseholds(locations, city, random.Random(1))
 
     totalPopulation = 0
     for person in people:

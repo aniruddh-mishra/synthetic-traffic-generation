@@ -1,4 +1,3 @@
-import random
 from status import StatusBar
 from objects import Link
 
@@ -6,7 +5,7 @@ def genAllLinks(linkConfigs, regions, districts, locations, plt, random):
     if not linkConfigs:
         linkConfigs = {}
 
-    numCentralHubs = linkConfigs.get("numCentralHubs")
+    meshingRatio = linkConfigs.get("meshingRatio")
     allCentralHubs = []
     districtRoads = []
     statusBar = StatusBar(len(districts) +  1)
@@ -14,12 +13,13 @@ def genAllLinks(linkConfigs, regions, districts, locations, plt, random):
         districtNodes = [] 
         for region in district:
             districtNodes.extend(regions[region])
-        intraDistrictRoads, centralHubs = genIntraDistrictLinks(numCentralHubs, districtNodes, plt, random)
+        intraDistrictRoads, centralHubs = genIntraDistrictLinks(linkConfigs, districtNodes, plt, random)
         districtRoads.extend(intraDistrictRoads)
         allCentralHubs.extend(centralHubs)
         statusBar.updateProgress()
 
-    highways = findMinimumSpanningTree(allCentralHubs)
+    highways, meshHighways = findMinimumSpanningTree(allCentralHubs, random, meshingRatio)
+    highways.extend(meshHighways)
     for highway in highways:
         if highway in districtRoads or [highway[1], highway[0]] in districtRoads:
             highways.remove(highway)
@@ -28,28 +28,69 @@ def genAllLinks(linkConfigs, regions, districts, locations, plt, random):
 
     plotRoads(highways, "white", plt)
 
+    districtRoadsCount = 0
+    districtRoadsLanes = 0
+    totalDistrictSpeedLimit = 0
+    districtRoadsDistance = 0
+
     allRoads = []
-    for road in districtRoads:
-        numLanes = 1
-        speedLimit = 5
+    districtRoadConfigs = linkConfigs.get("districtRoads")
+    publicTransportRatio = linkConfigs.get("roadsPublicTransportRatio")
+    publicTransportSeperate = linkConfigs.get("publicTransportSeperate")
+    for road in districtRoads: 
+        numLanes = random.randint(*districtRoadConfigs["numLanes"])
+        speedLimit = random.randint(*districtRoadConfigs["speedLimit"])
         modes = "car"
-        capacity = 3600
+        capacity = random.randint(*districtRoadConfigs["capacity"])
         nodes = [locations.index(road[0]), locations.index(road[1])]
-        roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road)
+
+        if publicTransportSeperate:
+            roadObject = Link(1, speedLimit, "pt", capacity, nodes, road, random)
+            districtRoadsLanes += 2
+        else:
+            modes += ", pt"
+
+        roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road, random)
+        districtRoadsDistance += roadObject.length
+        districtRoadsCount += 1
+        districtRoadsLanes += numLanes * 2
+        totalDistrictSpeedLimit += speedLimit
+
         allRoads.append(roadObject)
 
+    print(f"{districtRoadsCount} district roads constructed with a total of {districtRoadsLanes} lanes amongst all roads or an average of {round(districtRoadsLanes/districtRoadsCount, 2)} lanes per road. The average district roads speed limit was {round(totalDistrictSpeedLimit/districtRoadsCount, 2)} meters/sec. The total length of road is {round(districtRoadsDistance, 2)} meters.")
+
+    highwaysCount = 0 
+    highwaysLanes = 0
+    highwaysDistance = 0
+    totalSpeedLimit = 0
+    highwayConfigs = linkConfigs.get("highways")
     for road in highways:
-        numLanes = 3
-        speedLimit = 5
+        numLanes = random.randint(*highwayConfigs["numLanes"])
+        speedLimit = random.randint(*highwayConfigs["speedLimit"])
         modes = "car"
-        capacity = 36000
+        capacity = random.randint(*highwayConfigs["capacity"])                
         nodes = [locations.index(road[0]), locations.index(road[1])]
-        roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road)
-        allRoads.append(roadObject)
+        if publicTransportSeperate:
+            roadObject = Link(1, speedLimit, "pt", capacity, nodes, road, random)
+            highwaysLanes += 2
+        else:
+            modes += ", pt"
 
+        roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road, random)
+        highwaysCount += 1
+        highwaysLanes += numLanes * 2
+        totalSpeedLimit += speedLimit
+        highwaysDistance += roadObject.length
+        allRoads.append(roadObject)
+    
+    print(f"{highwaysCount} highways constructed with a total of {highwaysLanes} lanes amongst all roads or an average of {round(districtRoadsLanes/highwaysCount, 2)} lanes per road. The average highway speed limit was {round(totalSpeedLimit/highwaysCount, 2)} meters/sec. The total length of road is {round(highwaysDistance, 2)} meters.")
+    
     return allRoads
 
-def genIntraDistrictLinks(numCentralHubs, districtNodes, plt, random):
+def genIntraDistrictLinks(linkConfigs, districtNodes, plt, random):
+    numCentralHubs = linkConfigs.get("numCentralHubs")
+    meshingRatio = linkConfigs.get("meshingRatio")
     if len(districtNodes) == 1:
         return [], districtNodes 
 
@@ -62,7 +103,8 @@ def genIntraDistrictLinks(numCentralHubs, districtNodes, plt, random):
 
     centralHubs = random.sample(districtNodes, numCentralHubs)
 
-    districtRoads = findMinimumSpanningTree(districtNodes)
+    districtRoads, meshRoads = findMinimumSpanningTree(districtNodes, random, meshingRatio)
+    districtRoads.extend(meshRoads)
     plotRoads(districtRoads, "black", plt)
     return districtRoads, centralHubs
 
@@ -72,7 +114,7 @@ def plotRoads(roads, color, plt):
         deltaY = [road[0].location[1], road[1].location[1]]
         plt.plot(deltaX, deltaY, color=color, linewidth=1)
 
-def findMinimumSpanningTree(vertices):
+def findMinimumSpanningTree(vertices, random, meshingRatio):
     if len(vertices) == 1:
         return []
 
@@ -96,6 +138,7 @@ def findMinimumSpanningTree(vertices):
         nodes.append(vertexIndex)
 
     treeEdges = []
+    meshEdges = []
     edgeIndex = 0
     while len(treeEdges) < len(vertices) - 1 and edgeIndex < len(edges):
         start, end, distance = edges[edgeIndex]
@@ -104,7 +147,6 @@ def findMinimumSpanningTree(vertices):
         endParent = findParent(parents, end)
 
         if startParent != endParent:
-            edgeIndex += 1
             treeEdges.append([vertices[start], vertices[end]])
             if ranks[startParent] > ranks[endParent]:
                 parents[endParent] = startParent
@@ -113,8 +155,17 @@ def findMinimumSpanningTree(vertices):
             else:
                 parents[startParent] = endParent
                 ranks[endParent] += 1
+        else:
+            meshEdges.append(edges[edgeIndex])
+    
+    meshEdges.extend(edges[edgeIndex:])
+    meshEdges = random.choices(meshEdges, k=min(int(len(treeEdges) * meshingRatio), len(meshEdges)))
+    
+    returnMeshes = []
+    for edge in meshEdges:
+        returnMeshes.append([vertices[edge[0]], vertices[edge[1]]])
 
-    return treeEdges 
+    return treeEdges, returnMeshes
 
 def findParent(parents, node):
     if parents[node] == node:
