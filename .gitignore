@@ -12,6 +12,10 @@ output/*
 tests/*
 outputs/*
 matsim.jar
+presentation/
+!presentation/bibliography.bib 
+!presentation/images/
+!presentation/presentation.tex
 
 # Distribution / packaging
 .Python
