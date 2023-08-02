@@ -46,7 +46,8 @@ class Person:
         self.makeAct(taskHouse, parentSection, doc, not self.workFromHome)
     
         for task in self.schedule:
-            self.makeAct(task, parentSection, doc, True)
+            if not self.workFromHome or task["actionType"] != "work":
+                self.makeAct(task, parentSection, doc, True)
 
         taskHouse["times"] = None
         self.makeAct(taskHouse, parentSection, doc)
@@ -80,7 +81,7 @@ class Person:
         return returnString + "\n"
 
 class Location:
-    def __init__(self, location, locationTypes, zone, region, numResidents=None, maxWorkers=None):
+    def __init__(self, location, locationTypes, zone, region, numResidents=None, maxWorkers=None, houseEquivalence=None):
         self.location = location
         self.locationTypes = locationTypes
         self.zone = zone
@@ -88,6 +89,7 @@ class Location:
         self.numResidents = numResidents
         self.maxWorkers = maxWorkers
         self.timings = None
+        self.houseEquivalence = houseEquivalence
         self.transport = []
         self.workers = []
 

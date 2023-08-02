@@ -13,10 +13,29 @@
 	<module name="controler">
 		<param name="outputDirectory" value="./outputs" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="0" />
+		<param name="lastIteration" value="10" />
 	</module>
 
-	<module name="planCalcScore">
+  <module name="planscalcroute" >
+		<param name="networkModes" value="car,bicycle" />
+	</module>
+  
+  <module name="qsim">	
+		<param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData" />
+		<param name="mainMode" value="car,bicycle" />
+		<param name="linkDynamics" value="PassingQ" />
+		<param name="trafficDynamics" value="kinematicWaves" />
+  </module>
+
+  <module name="vehicles" >
+		<param name="vehiclesFile" value="vehicles.xml" /> 
+	</module>
+
+  <module name="planCalcScore">
+    <parameterset type="modeParams" >
+      <param name="mode" value="bicycle" />
+      <param name="monetaryDistanceRate" value="0.0" />
+    </parameterset>
 		<parameterset type="activityParams" >
 			<param name="activityType"            value="home" /> <!-- home -->
 			<param name="typicalDuration" value="12:00:00" />

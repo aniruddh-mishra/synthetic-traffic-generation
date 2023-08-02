@@ -28,7 +28,7 @@ def nodeToLocations(node, info, random, zoneType, region):
     if info.get("maxWorkers"):
         maxWorkers = random.randint(*info['maxWorkers'])
     
-    location = Location(node, info['buildingTypes'], zoneType, region, numResidents, maxWorkers)
+    location = Location(node, info['buildingTypes'], zoneType, region, numResidents, maxWorkers, info.get("houseEquivalence"))
    
     timings = info.get("timings")
     if timings:

@@ -43,7 +43,7 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData, random)
             if startTime > endTime:
                 timings = timingsGuidelines
 
-    transport = "transit_walk" # TODO add walking?
+    transport = "bicycle"
     if house.hasCar(timings):
         transport = "car"
         house.checkoutCar(timings)
@@ -87,8 +87,13 @@ def genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData, random)
             transport = "car"
             person.addToSchedule("home", house, [activityTimings[0], activityTimings[0]], transport)
 
+        if transport == "car" and not house.hasCar(activityTimings):
+            transport = "bicycle"
+            person.addToSchedule("home", house, [activityTimings[0], activityTimings[0]], transport)
+
         if transport == "car":
             house.checkoutCar(activityTimings)
+
         person.addToSchedule("leisure", chosenActivity, activityTimings, transport)
         sortedLeisureLocations.remove(chosenActivity)
 
@@ -107,16 +112,18 @@ def genHousehold(house, jobs, leisureLocations, cityData, statusBar, random):
         house.transport = transport
 
     members = []
-    numResidents = house.numResidents
     sortedJobs = sortLocations(house.location, jobs, sortJobsFunction)
     sortedLeisureLocations = sortLocations(house.location, leisureLocations, sortLeisureFunction)
-    for member in range(numResidents):
-        person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData, random)
-        if not person.job.isHiring() and not person.workFromHome:
-            jobs.remove(person.job)
-            sortedJobs.remove(person.job)
-        members.append(person)
-        statusBar.updateProgress()
+
+    for _ in range(house.houseEquivalence):
+        numResidents = house.numResidents
+        for member in range(numResidents):
+            person = genPerson(house, sortedJobs, jobs, sortedLeisureLocations, cityData, random)
+            if not person.job.isHiring() and not person.workFromHome:
+                jobs.remove(person.job)
+                sortedJobs.remove(person.job)
+            members.append(person)
+            statusBar.updateProgress()
     return members
 
 def sortLocations(reference, listLocations, function):

@@ -44,11 +44,7 @@ def genAllLinks(linkConfigs, regions, districts, locations, plt, random):
         capacity = random.randint(*districtRoadConfigs["capacity"])
         nodes = [locations.index(road[0]), locations.index(road[1])]
 
-        if publicTransportSeperate:
-            roadObject = Link(1, speedLimit, "pt", capacity, nodes, road, random)
-            districtRoadsLanes += 2
-        else:
-            modes += ", pt"
+        modes += ",bicycle"
 
         roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road, random)
         districtRoadsDistance += roadObject.length
@@ -71,11 +67,8 @@ def genAllLinks(linkConfigs, regions, districts, locations, plt, random):
         modes = "car"
         capacity = random.randint(*highwayConfigs["capacity"])                
         nodes = [locations.index(road[0]), locations.index(road[1])]
-        if publicTransportSeperate:
-            roadObject = Link(1, speedLimit, "pt", capacity, nodes, road, random)
-            highwaysLanes += 2
-        else:
-            modes += ", pt"
+       
+        modes += ",bicycle"
 
         roadObject = Link(numLanes, speedLimit, modes, capacity, nodes, road, random)
         highwaysCount += 1
