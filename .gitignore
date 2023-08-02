@@ -12,7 +12,7 @@ output/*
 tests/*
 outputs/*
 matsim.jar
-presentation/
+presentation/*
 !presentation/bibliography.bib 
 !presentation/images/
 !presentation/presentation.tex
