@@ -12,10 +12,17 @@ output/*
 tests/*
 outputs/*
 matsim.jar
+
+# Latex Finals
 presentation/*
 !presentation/bibliography.bib 
 !presentation/images/
 !presentation/presentation.tex
+
+paper/*
+!paper/bibliography.bib
+!paper/images/
+!paper/paper.tex
 
 # Distribution / packaging
 .Python
