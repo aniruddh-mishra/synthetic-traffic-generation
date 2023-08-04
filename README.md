@@ -69,9 +69,12 @@ To build the paper first change directories into the `paper/` folder
 cd paper/
 ```
 
-Next, you can make the paper with a simple command:
+Next, you can make the paper with a simple set of commands:
 
 ```bash
+pdflatex paper.tex
+bibtex paper 
+pdflatex paper.tex 
 pdflatex paper.tex
 ```
 
