@@ -17,7 +17,7 @@ Clone the repository into your computer with the following command:
 git clone https://codeberg.org/Inventor853/synthetic-traffic-generation.git --depth 1
 ```
 
-After creating the folder you `synthetic-traffic-generation` you will want to go into the repository to complete the installation:
+After cloning the folder `synthetic-traffic-generation`, you will want to go into the repository to complete the installation:
 
 ```bash
 cd synthetic-traffic-generation
