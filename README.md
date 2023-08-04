@@ -92,7 +92,7 @@ latexmk -c
 
 ## Usage
 
-Before the code can be used, the configuration file `config.json` should be modified to your preferences.
+Before the code can be used, the configuration file `config.json` should be modified to your preferences. In addition, `vehicles.xml` can also be changed if you so desire based on [MATSIM](https://www.matsim.org/) documentation.
 
 #### Important Terms
 
