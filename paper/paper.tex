@@ -193,14 +193,14 @@
         \centering
         \includegraphics[width=0.45\textwidth]{images/finalzoningwnodes.png}
         \caption{Final iteration of the nodes}
-        \label{fig:first-zoning}
+        \label{fig:final-zoning-nodes}
     \end{figure}
 
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.45\textwidth]{images/finalnetwork.png}
         \caption{Final iteration of the network}
-        \label{fig:first-zoning}
+        \label{fig:final-network}
     \end{figure}
 
     \quad The final iteration of the road system was much neater and more organized with the help of object oriented programming. The nodes were finally calculated with a different algorithm. Given a district, with a size determined in Section \ref{zoning-implementation}, the land was iterated over to find the placement of zones. The program continuously picked random points in the districts and subtracted the area of the placed building from the remaining area in the district. For a zone with subzones within it, the program simply chose the building type from a list of all possible buildings. Once, again all of this information was configurable by the user. In addition, the program placed atleast one building from the top level zone in this case by checking neighbors within the district for a building of the correct type. If no building was found, then the program inserted a top level building automatically. This resulted in the variation of dot colors as seen in the plot. The different color represent different building types. Finally, this iteration also added our better road network. This was heavily described in section \ref{network}. However, to put it simply the baseline road network is just a minimum spanning tree that connects nodes in a district. The highways are a minimum spanning tree that connect a number of central hubs in each district, defined in the configuration file. Each type of road also has attributes of speed, capacity, and number of lanes, which can be changed by configurations as well. 
@@ -209,7 +209,7 @@
         \centering
         \includegraphics[width=0.45\textwidth]{images/meshednetwork.png}
         \caption{Final iteration of the network with a 1\% meshing ratio}
-        \label{fig:first-zoning}
+        \label{fig:final-meshed-network}
     \end{figure}
 
     \quad The final change made to the network was meshing\footnote{Adding additional roads to the baseline network}. Meshing determined the number of extra roads with the following equation:
